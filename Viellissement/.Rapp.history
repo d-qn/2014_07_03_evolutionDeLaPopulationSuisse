@@ -1,0 +1,229 @@
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+#############################################################################################
+###		SETTINGS#
+#############################################################################################
+#
+source("~/swissinfo/_helpers/helpers.R")#
+font <- "Open Sans"#
+#
+library(animation)#
+#
+data.file <- 'contenate_allData.csv'#
+#
+#############################################################################################
+###		Load all data in one data.frame#
+#############################################################################################
+#
+data <- read.csv(data.file, stringsAsFactors = F)
+str(data)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+colnames(data)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+melt(data)
+str(data)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+colnames(data)[2:ncol(data)]
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+reshape(data, varying = colnames(data)[2:ncol(data)])
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+reshape(data, varying = colnames(data)[2:ncol(data)], direction = "long")
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+colnames(data)[2:ncol(data)]
+gsub("^X", "", colnames(data)[2:ncol(data)]
+gsub("^X", "", colnames(data)[2:ncol(data)])
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+colnames(data)[2:ncol(data)] <- gsub("^X", "", colnames(data)[2:ncol(data)])
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+reshape(data, varying = colnames(data)[2:ncol(data)], direction = "long")
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+data <- read.csv(data.file, stringsAsFactors = F)#
+colnames(data)[2:ncol(data)] <- gsub("^X", "", colnames(data)[2:ncol(data)])#
+reshape(data, varying = list(2:ncol(data)), direction = "long")
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+head(reshape(data, varying = list(2:ncol(data)), direction = "long"))
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+head(reshape(data, idvar = "Age", varying = list(2:ncol(data)), direction = "long"))
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+head(reshape(data, idvar = "Age", varying = colnames(data)[2:ncol(data)], direction = "long"))
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+colnames(data)[2:ncol(data)]
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+head(reshape(data, idvar = "Age", varying = colnames(data)[2:ncol(data)], direction = "long"))
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+head(reshape(data, idvar = "Age", varying = colnames(data)[2:ncol(data)], direction = "long"), v.names = "Année")
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+reshape(data, idvar = "Age", varying = colnames(data)[2:ncol(data)], direction = "long"), v.names = "Année")
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+reshape(data, idvar = "Age", varying = colnames(data)[2:ncol(data)], direction = "long", v.names = "Année")
+head(reshape(data, idvar = "Age", varying = colnames(data)[2:ncol(data)], direction = "long", v.names = "Année"))
+?melt
+melt(data)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+melt(data[,2:ncol(data)])
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+cbind(data[1,], melt(data[,2:ncol(data)])
+)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+melt(data[,2:ncol(data)]
+)
+str(melt(data[,2:ncol(data)])
+)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+data[1,]
+data[,1]
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+data.frame(Age = data[,1], melt(data[,2:ncol(data)]))
+str(data.frame(Age = data[,1], melt(data[,2:ncol(data)])))
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+data <- read.csv(data.file, stringsAsFactors = F)#
+colnames(data)[2:ncol(data)] <- gsub("^X", "", colnames(data)[2:ncol(data)])#
+#
+data <- data.frame(Age = data[,1], melt(data[,2:ncol(data)]))
+str(data)
+head(data)
+tail(data)
+?melt
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+data <- data.frame(Age = data[,1], melt(data[,2:ncol(data)], variable_name = "Annee"))
+str(data)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+melt(data[,2:ncol(data)], variable_name = "Annee")
+melt(data)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+data <- read.csv(data.file, stringsAsFactors = F)#
+colnames(data)[2:ncol(data)] <- gsub("^X", "", colnames(data)[2:ncol(data)])
+melt(data)
+str(variable_name)
+str(melt(data))
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+data <- read.csv(data.file, stringsAsFactors = F)#
+colnames(data)[2:ncol(data)] <- gsub("^X", "", colnames(data)[2:ncol(data)])#
+#
+data <- data.frame(Age = data[,1], melt(data[,2:ncol(data)]))
+str(data)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+colnames(data) <- c('Age', 'Annee', "value")
+str(data)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+data$Annee <- as.numeric(as.character(data$Annee))
+str(data)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+ddply(data, .(Annee), summarize, value / sum(value))
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+ddply(data, .(Annee), summarize, #
+	annee = Annee,  #
+	age = Age,#
+	prop = value / sum(value))
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+ddply(data, .(Annee), summarize, #
+	age = Age,#
+	prop = value / sum(value))
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+data <- read.csv(data.file, stringsAsFactors = F)#
+colnames(data)[2:ncol(data)] <- gsub("^X", "", colnames(data)[2:ncol(data)])#
+#
+data <- data.frame(Age = data[,1], melt(data[,2:ncol(data)]))#
+colnames(data) <- c('Age', 'Annee', "value")#
+data$Annee <- as.numeric(as.character(data$Annee))#
+# compute for each year, the proportion of by age group#
+prop <- ddply(data, .(Annee), summarize, #
+	age = Age,#
+	prop = value / sum(value))
+str(prop)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+ggplot(data = prop) + geom_histogram(aes(Age, prop)) + facet_wrap(Annee)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+ggplot(data = prop) + geom_histogram(aes(Age, prop)) + facet_wrap(Annee)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+ggplot(data = prop) + geom_histogram(aes(Age, prop)) + facet_wrap(. ~ Annee)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+ggplot(data = prop) + geom_histogram(aes(Age, prop)) + facet_wrap( ~ Annee)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+data <- read.csv(data.file, stringsAsFactors = F)#
+colnames(data)[2:ncol(data)] <- gsub("^X", "", colnames(data)[2:ncol(data)])#
+#
+data <- data.frame(Age = data[,1], melt(data[,2:ncol(data)]))#
+colnames(data) <- c('Age', 'Annee', "value")#
+data$Annee <- as.numeric(as.character(data$Annee))#
+# compute for each year, the proportion of by age group#
+prop <- ddply(data, .(Annee), summarize, #
+	Age = Age,#
+	prop = value / sum(value))#
+	ggplot(data = prop) + geom_histogram(aes(Age, prop)) + facet_wrap( ~ Annee)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+ggplot(data = prop) + geom_bar(aes(Age, prop), stats = "identity") + facet_wrap( ~ Annee)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+ggplot(data = prop) + geom_bar(aes(Age, prop), stat = "identity") + facet_wrap( ~ Annee)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+ggplot(data = prop) + geom_bar(aes(Age, prop), stat = "identity") + facet_wrap( ~ Annee) + theme_minimal()
+?saveGIF
+saveGIF({#
+    brownian.motion(pch = 21, cex = 5, col = "red", bg = "yellow")#
+}, movie.name = "brownian_motion.gif", interval = 0.1, nmax = 30, ani.width = 600, #
+    ani.height = 600)#
+#
+## non-constant intervals between image frames#
+saveGIF({#
+    brownian.motion(pch = 21, cex = 5, col = "red", bg = "yellow")#
+}, movie.name = "brownian_motion2.gif", interval = runif(30, 0.01, 1), nmax = 30)
+saveGIF({#
+    brownian.motion(pch = 21, cex = 5, col = "red", bg = "yellow")#
+}, movie.name = "brownian_motion.gif", interval = 0.1, nmax = 30, ani.width = 600, #
+    ani.height = 600)#
+#
+## non-constant intervals between image frames#
+saveGIF({#
+    brownian.motion(pch = 21, cex = 5, col = "red", bg = "yellow")#
+}, movie.name = "brownian_motion2.gif", interval = runif(30, 0.01, 1), nmax = 30)
+help(package="animation")
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+data <- read.csv(data.file, stringsAsFactors = F)#
+colnames(data)[2:ncol(data)] <- gsub("^X", "", colnames(data)[2:ncol(data)])#
+#
+data <- data.frame(Age = data[,1], melt(data[,2:ncol(data)]))#
+colnames(data) <- c('Age', 'Annee', "value")#
+data$Annee <- as.character(data$Annee)
+str(data$Annee)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+source("~/swissinfo/_helpers/helpers.R")#
+font <- "Open Sans"#
+#
+library(animation)#
+#
+data.file <- 'contenate_allData.csv'#
+#
+#############################################################################################
+###		Load all data in one data.frame#
+#############################################################################################
+#
+data <- read.csv(data.file, stringsAsFactors = F)#
+colnames(data)[2:ncol(data)] <- gsub("^X", "", colnames(data)[2:ncol(data)])#
+#
+data <- data.frame(Age = data[,1], melt(data[,2:ncol(data)]))#
+colnames(data) <- c('Age', 'Annee', "value")#
+data$Annee <- as.numeric(as.character(data$Annee))
+str(data)
+tail(data)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+prop <- ddply(data, .(Annee), summarize, #
+	Age = Age,#
+	prop = value / sum(value))
+str(prop)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+ggplot(data = prop) + geom_bar(aes(Age, prop), stat = "identity") + facet_wrap( ~ Annee) + theme_minimal()
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+for(a in unique(prop$Annee)) {#
+	ggplot(data = prop[prop$Annee = a,]) + geom_bar(aes(Age, prop), stat = "identity") #
+}
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+for(a in unique(prop$Annee)) {#
+	ggplot(data = prop[prop$Annee = a,]) + geom_bar(aes(Age, prop), stat = "identity") #
+}
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+for(a in unique(prop$Annee)) {#
+	ggplot(data = prop[prop$Annee == a,]) + geom_bar(aes(Age, prop), stat = "identity") #
+}
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+for(a in unique(prop$Annee)) {#
+	print(ggplot(data = prop[prop$Annee == a,]) + geom_bar(aes(Age, prop), stat = "identity") )#
+}
