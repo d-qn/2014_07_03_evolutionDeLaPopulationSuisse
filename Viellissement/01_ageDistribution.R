@@ -29,7 +29,7 @@ prop <- ddply(data, .(Annee), summarize,
 	prop = value / sum(value) * 100)
 
 
-ggplot(data = datan) + geom_histogram(aes(Age, value)) + facet_wrap( ~ Annee) + theme_minimal()
+#ggplot(data = datan) + geom_histogram(aes(Age, value)) + facet_wrap( ~ Annee) + theme_minimal()
 
 
 #ggplot(data = prop) + geom_bar(aes(Age, prop), stat = "identity") + facet_wrap( ~ Annee) + theme_minimal()
@@ -38,16 +38,21 @@ idx.x <- c(seq(min(as.numeric(data$Age)), max(as.numeric(data$Age)), 10), nlevel
 xlabel[idx.x]<- levels(data$Age)[idx.x]
 title <- "Proportion de la population Suisse par âge"
 
+
 plotayear <- function(data, a) {
-	ghist <- ggplot(data = prop[prop$Annee == a,]) + geom_bar(aes(Age, prop), size =0.01, stat = "identity", color = swi_9palette[9],
-	fill = swi_9palette[3]) + ggtheme + ylim(c(0, max(prop$prop))) + scale_x_discrete("Age", xlabel) + ylab ("%") +
-	geom_text(data = data.frame(x = levels(prop$Age)[70], y = max(prop$prop)-1.1, label = as.character(a)),
-	aes(label = label, x = x, y = y), font = font, alpha = 0.1, size = 66) + geom_text(data = data.frame(x = levels(prop$Age)[1],
-	y = max(prop$prop)-0.05, label = title), aes(label = label, x = x, y = y), font = font, alpha = 1, size = 6, hjust = 0,
-	fontface ="bold")
-	plot(ghist)
+	ghist <- ggplot(data = prop[prop$Annee == a,]) + geom_bar(aes(Age, prop), size =0.01, stat = "identity", color = 	 	 	 		swi_9palette[3], fill = swi_9palette[3]) + ggtheme  + scale_x_discrete("", xlabel) +
+	scale_y_continuous(name = "%", limits = c(0, max(prop$prop)), expand = c(0.01,0.01)) +
+	geom_text(data = data.frame(x = levels(prop$Age)[nlevels(prop$Age)], y = max(prop$prop)-0.6, label = as.character(a)),
+	aes(label = label, x = x, y = y), family = font, alpha = 0.4, size = 60,  color = swi_9palette[9], hjust = 1) +
+	geom_text(data = data.frame(x = levels(prop$Age)[1],
+	y = max(prop$prop)-0.07, label = title), aes(label = label, x = x, y = y), family = font, alpha = 1, size = 7, hjust = 0) + 	theme(axis.text = element_text(size = 14, family = font, lineheight = 0), plot.margin = unit(c(0,2,4,0), "lines"))
+	ghista <- ghist + annotation_custom(grob = textGrob("swissinfo.ch"), xmin = 95, xmax = 100, ymin = -0.3, ymax = -0.3)
+    gt <- ggplot_gtable(ggplot_build(ghista))
+    gt$layout$clip[gt$layout$name=="panel"] <- "off"
+	grid.newpage()
+    grid.draw(gt)
 }
-a <- unique(prop$Annee)[1]
+a <- unique(prop$Annee)[10]
 plotayear(data, a)
 
 
@@ -57,6 +62,6 @@ saveGIF({
 	for(a in unique(prop$Annee)) {
 		plotayear(data, a)
 	}
-}, movie.name = "populationAge.gif", interval = 0.1, nmax = 50, ani.width = 640, ani.height = 500)
+}, movie.name = "populationAge.gif", interval = 0.1, nmax = 50, ani.width = 900, ani.height = 600)
 
 
