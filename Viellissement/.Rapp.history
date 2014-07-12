@@ -1,3 +1,363 @@
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger')
+#############################################################################################
+###		SETTINGS#
+#############################################################################################
+#
+source("~/swissinfo/_helpers/helpers.R")#
+font <- "Open Sans"#
+#
+widthFig <- 10#
+heightFig <- widthFig * 1.5#
+#
+#############################################################################################
+###		Plot world map % immigrant foreign born#
+#############################################################################################
+#
+data.file <- 'hs-f-01.01.01.03.csv'#
+data.read <- read.csv(data.file)#
+#
+## Reformat#
+# get rid of the ...#
+for(i in 2:ncol(data.read)) {#
+	data.read[,i] <- as.numeric(as.character(data.read[,i]))#
+}#
+# replace NA with 0#
+data.read[is.na(data.read)] <- 0#
+#
+#rename country#
+data.read[,1] <- gsub(" \\d\\)", "", data.read[,1])#
+# rename columns/year#
+colnames(data.read) <- gsub("^X", "", colnames(data.read))#
+# cluster ex-yougoslavia countries#
+yougo <- c('Yougoslavie', 'Serbie-et-Monténégro', 'Serbie', 'Monténégro', 'Kosovo', 'Croatie', 'Bosnie et Herzégovine','Macédoine')#
+idx <- match(yougo, data.read[,1])#
+stopifnot(all(idx))#
+#
+data <- data.read[-idx,]#
+tmp <- cbind(Nationalité = "Ex-Yougoslavie", as.data.frame(lapply(data.read[idx,2:ncol(data.read)], function(col) sum(col, na.rm = T))))#
+colnames(tmp) <- colnames(data)#
+#
+data <- rbind(data, tmp)#
+#
+pdf("Figures.pdf", width = widthFig, height = heightFig, family = font)#
+#############################################################################################
+###		Population Suisse, Européenne, et non-européenne#
+#############################################################################################
+#
+data.sub <- data#
+data.sub <- data.sub[data.sub[,1] %in% c('Suisse', 'Europe'),]#
+data.sub <- melt(rbind(data.sub, cbind(Nationalité="Non-Européan", data[data[,1] == 'Etranger',-1] - data[data[,1] == 'Europe',-1])))#
+data.sub$variable <- as.numeric(as.character(data.sub$variable))#
+#
+#ggplot(data.sub) + geom_line(aes(variable, value, group = Nationalité, color = Nationalité))#
+g1 <- ggplot(data.sub, aes(variable, value, fill = Nationalité)) + geom_area(position = 'stack') + ggtheme +#
+	xlab("Année") + ylab("Population") + scale_fill_manual(values = swi_9palette[c(2,8,4)]) +#
+	ggtitle("La population résidente en Suisse de 1850-2009")#
+#
+g1#
+g1 + geom_vline(xintercept = 1880, color = "lightgrey")#
+## ANNOTATION#
+# 1. Au XIXe siècle, des millions d'Européens, des centaines de milliers de Suisses ont quitté le Vieux-Continent pour chercher un monde nouveau.#
+# La précarité des conditions de vie et l’insuffisance de la production agricole#
+# 2. C'est seulement vers 1880 que l’immigration d’étrangers vers la Suisse, provenant surtout des pays limitrophes, dépasse l’émigration hors de Suisse#
+# Au début du 20e siècle, 97% des étrangers proviennent des pays voisins (Allemagne, France, Italie, Autriche).#
+# 3. Pour un pays où la politique d'immigration et la question des étrangers est régulièrement , il est bon de mentionner qu'en 2012, 85% de la population résidante permanente étrangère en Suisse provient d'un pays européen. 2/3 de l'UE/AELE.#
+#
+#############################################################################################
+###		Population pays d'Europe et continents#
+#############################################################################################
+#
+data.sub <- melt(data)#
+data.sub$variable <- as.numeric(as.character(data.sub$variable))#
+#
+#pays.sub <- c('Afrique', 'Asie', 'Amérique', 'Allemagne', 'France', 'Italie', 'Portugal', 'Espagne', 'Ex-Yougoslavie')#
+#pays.sub <- c('Allemagne', 'France', 'Italie', 'Portugal', 'Espagne', 'Ex-Yougoslavie')#
+pays.sub <- c('Allemagne','Italie', 'Portugal', 'Espagne', 'Ex-Yougoslavie', 'France', "Autriche",  "Turquie", 'Autre pays européen')#
+#
+pays.sub <- structure(1:length(pays.sub), names = c(pays.sub))#
+facetGroup <- structure(c(1:5, rep(6, 4)), names = names(pays.sub)[c(1:5, rep(9, 4))])#
+# # recompute 'autre pays européen'#
+# data.sub[data.sub[,1] == 'Autre pays européen','value'] <- as.vector(by(data.sub, data.sub$variable, function(dd) {#
+# 	dd[dd[,1] == 'Europe','value'] - sum(dd[dd[,1] %in% names(pays.sub)[-length(pays.sub)],'value'], na.rm = T)#
+# }))#
+#
+data.sub <- data.sub[which(data.sub[,1] %in% names(pays.sub)),]#
+data.sub[,1] <- factor(data.sub[,1], levels = names(pays.sub))#
+data.sub$facetGroup <- factor(names(facetGroup)[match(data.sub[,1], names(pays.sub))], levels = unique(names(facetGroup)))#
+#
+#ggplot(data.sub, aes(variable, value)) + geom_line() + facet_wrap ( ~ Nationalité, nrow = 2) + ggtheme_ygrid#
+ggplot(data.sub, aes(variable, value)) + geom_area(aes(fill = Nationalité), position = 'stack') + ggtheme_ygrid +#
+	xlab("Année") + ylab("Population") + facet_wrap ( ~ facetGroup, nrow = 3) + scale_fill_manual(values = swi_9palette) +#
+	ggtitle("Population d'Europe résidant en Suisse de 1850-2009")#
+dev.off()#
+## ANNOTATIONS#
+# 1. Au début du XXème siècle, Les ressortissants des divers états allemands forment le pourcentage le plus élevé. Il s’agit essentiellement d’ouvriers artisans qui constituent, dans quelques villes, une proportion importante de tailleurs, de cordonniers et de charpentiers. Les Italiens s’imposent de plus en plus, une grande partie d’entre eux s’engage comme terrassiers et manœuvres dans la construction des chemins de fer et des premières usines hydro-électriques#
+# 2.
+?theme
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger')
+data.sub <- data#
+data.sub <- data.sub[data.sub[,1] %in% c('Suisse', 'Europe'),]#
+data.sub <- melt(rbind(data.sub, cbind(Nationalité="Non-Européan", data[data[,1] == 'Etranger',-1] - data[data[,1] == 'Europe',-1])))#
+data.sub$variable <- as.numeric(as.character(data.sub$variable))#
+#
+#ggplot(data.sub) + geom_line(aes(variable, value, group = Nationalité, color = Nationalité))#
+g1 <- ggplot(data.sub, aes(variable, value, fill = Nationalité)) + geom_area(position = 'stack') + ggtheme +#
+	xlab("Année") + ylab("Population") + scale_fill_manual(values = swi_9palette[c(2,8,4)]) +#
+	ggtitle("La population résidente en Suisse de 1850-2009")#
+#
+g1
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger')
+data.sub <- data#
+data.sub <- data.sub[data.sub[,1] %in% c('Suisse', 'Europe'),]#
+data.sub <- melt(rbind(data.sub, cbind(Nationalité="Non-Européan", data[data[,1] == 'Etranger',-1] - data[data[,1] == 'Europe',-1])))#
+data.sub$variable <- as.numeric(as.character(data.sub$variable))#
+#
+#ggplot(data.sub) + geom_line(aes(variable, value, group = Nationalité, color = Nationalité))#
+g1 <- ggplot(data.sub, aes(variable, value, fill = Nationalité)) + geom_area(position = 'stack') + ggtheme +#
+	xlab("Année") + ylab("Population") + scale_fill_manual(values = swi_9palette[c(2,8,4)]) +#
+	ggtitle("La population résidente en Suisse de 1850-2009") + theme(legend.position = "top")#
+#
+g1
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger')
+data.sub <- data#
+data.sub <- data.sub[data.sub[,1] %in% c('Suisse', 'Europe'),]#
+data.sub <- melt(rbind(data.sub, cbind(Nationalité="Non-Européan", data[data[,1] == 'Etranger',-1] - data[data[,1] == 'Europe',-1])))#
+data.sub$variable <- as.numeric(as.character(data.sub$variable))#
+#
+#ggplot(data.sub) + geom_line(aes(variable, value, group = Nationalité, color = Nationalité))#
+g1 <- ggplot(data.sub, aes(variable, value, fill = Nationalité)) + geom_area(position = 'stack') + ggtheme +#
+	xlab("Année") + ylab("Population") + scale_fill_manual(values = swi_9palette[c(2,8,4)]) +#
+	ggtitle("La population résidente en Suisse de 1850-2009") + theme(legend.position = "top")#
+#
+g1#
+g1 + geom_vline(xintercept = 1880, color = "lightgrey")#
+## ANNOTATION#
+# 1. Au XIXe siècle, des millions d'Européens, des centaines de milliers de Suisses ont quitté le Vieux-Continent pour chercher un monde nouveau.#
+# La précarité des conditions de vie et l’insuffisance de la production agricole#
+# 2. C'est seulement vers 1880 que l’immigration d’étrangers vers la Suisse, provenant surtout des pays limitrophes, dépasse l’émigration hors de Suisse#
+# Au début du 20e siècle, 97% des étrangers proviennent des pays voisins (Allemagne, France, Italie, Autriche).#
+# 3. Pour un pays où la politique d'immigration et la question des étrangers est régulièrement , il est bon de mentionner qu'en 2012, 85% de la population résidante permanente étrangère en Suisse provient d'un pays européen. 2/3 de l'UE/AELE.#
+#
+#############################################################################################
+###		Population pays d'Europe et continents#
+#############################################################################################
+#
+data.sub <- melt(data)#
+data.sub$variable <- as.numeric(as.character(data.sub$variable))#
+#
+#pays.sub <- c('Afrique', 'Asie', 'Amérique', 'Allemagne', 'France', 'Italie', 'Portugal', 'Espagne', 'Ex-Yougoslavie')#
+#pays.sub <- c('Allemagne', 'France', 'Italie', 'Portugal', 'Espagne', 'Ex-Yougoslavie')#
+pays.sub <- c('Allemagne','Italie', 'Portugal', 'Espagne', 'Ex-Yougoslavie', 'France', "Autriche",  "Turquie", 'Autre pays européen')#
+#
+pays.sub <- structure(1:length(pays.sub), names = c(pays.sub))#
+facetGroup <- structure(c(1:5, rep(6, 4)), names = names(pays.sub)[c(1:5, rep(9, 4))])#
+# # recompute 'autre pays européen'#
+# data.sub[data.sub[,1] == 'Autre pays européen','value'] <- as.vector(by(data.sub, data.sub$variable, function(dd) {#
+# 	dd[dd[,1] == 'Europe','value'] - sum(dd[dd[,1] %in% names(pays.sub)[-length(pays.sub)],'value'], na.rm = T)#
+# }))#
+#
+data.sub <- data.sub[which(data.sub[,1] %in% names(pays.sub)),]#
+data.sub[,1] <- factor(data.sub[,1], levels = names(pays.sub))#
+data.sub$facetGroup <- factor(names(facetGroup)[match(data.sub[,1], names(pays.sub))], levels = unique(names(facetGroup)))#
+#
+#ggplot(data.sub, aes(variable, value)) + geom_line() + facet_wrap ( ~ Nationalité, nrow = 2) + ggtheme_ygrid#
+ggplot(data.sub, aes(variable, value)) + geom_area(aes(fill = Nationalité), position = 'stack') + ggtheme_ygrid +#
+	xlab("Année") + ylab("Population") + facet_wrap ( ~ facetGroup, nrow = 3) + scale_fill_manual(values = swi_9palette) +#
+	ggtitle("Population d'Europe résidant en Suisse de 1850-2009")#
+dev.off()#
+## ANNOTATIONS#
+# 1. Au début du XXème siècle, Les ressortissants des divers états allemands forment le pourcentage le plus élevé. Il s’agit essentiellement d’ouvriers artisans qui constituent, dans quelques villes, une proportion importante de tailleurs, de cordonniers et de charpentiers. Les Italiens s’imposent de plus en plus, une grande partie d’entre eux s’engage comme terrassiers et manœuvres dans la construction des chemins de fer et des premières usines hydro-électriques#
+# 2.
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger')
+#############################################################################################
+###		SETTINGS#
+#############################################################################################
+#
+source("~/swissinfo/_helpers/helpers.R")#
+font <- "Open Sans"#
+#
+widthFig <- 10#
+heightFig <- widthFig * 1.5#
+#
+#############################################################################################
+###		Plot world map % immigrant foreign born#
+#############################################################################################
+#
+data.file <- 'hs-f-01.01.01.03.csv'#
+data.read <- read.csv(data.file)#
+#
+## Reformat#
+# get rid of the ...#
+for(i in 2:ncol(data.read)) {#
+	data.read[,i] <- as.numeric(as.character(data.read[,i]))#
+}#
+# replace NA with 0#
+data.read[is.na(data.read)] <- 0#
+#
+#rename country#
+data.read[,1] <- gsub(" \\d\\)", "", data.read[,1])#
+# rename columns/year#
+colnames(data.read) <- gsub("^X", "", colnames(data.read))#
+# cluster ex-yougoslavia countries#
+yougo <- c('Yougoslavie', 'Serbie-et-Monténégro', 'Serbie', 'Monténégro', 'Kosovo', 'Croatie', 'Bosnie et Herzégovine','Macédoine')#
+idx <- match(yougo, data.read[,1])#
+stopifnot(all(idx))#
+#
+data <- data.read[-idx,]#
+tmp <- cbind(Nationalité = "Ex-Yougoslavie", as.data.frame(lapply(data.read[idx,2:ncol(data.read)], function(col) sum(col, na.rm = T))))#
+colnames(tmp) <- colnames(data)#
+#
+data <- rbind(data, tmp)#
+#
+pdf("Figures.pdf", width = widthFig, height = heightFig, family = font)#
+#############################################################################################
+###		Population Suisse, Européenne, et non-européenne#
+#############################################################################################
+#
+data.sub <- data#
+data.sub <- data.sub[data.sub[,1] %in% c('Suisse', 'Europe'),]#
+data.sub <- melt(rbind(data.sub, cbind(Nationalité="Non-Européan", data[data[,1] == 'Etranger',-1] - data[data[,1] == 'Europe',-1])))#
+data.sub$variable <- as.numeric(as.character(data.sub$variable))#
+#
+#ggplot(data.sub) + geom_line(aes(variable, value, group = Nationalité, color = Nationalité))#
+g1 <- ggplot(data.sub, aes(variable, value, fill = Nationalité)) + geom_area(position = 'stack') + ggtheme +#
+	xlab("Année") + ylab("Population") + scale_fill_manual(values = swi_9palette[c(2,8,4)]) +#
+	ggtitle("La population résidente en Suisse de 1850-2009") + theme(legend.position = "top")#
+#
+g1#
+g1 + geom_vline(xintercept = 1880, color = "lightgrey")#
+## ANNOTATION#
+# 1. Au XIXe siècle, des millions d'Européens, des centaines de milliers de Suisses ont quitté le Vieux-Continent pour chercher un monde nouveau.#
+# La précarité des conditions de vie et l’insuffisance de la production agricole#
+# 2. C'est seulement vers 1880 que l’immigration d’étrangers vers la Suisse, provenant surtout des pays limitrophes, dépasse l’émigration hors de Suisse#
+# Au début du 20e siècle, 97% des étrangers proviennent des pays voisins (Allemagne, France, Italie, Autriche).#
+# 3. Pour un pays où la politique d'immigration et la question des étrangers est régulièrement , il est bon de mentionner qu'en 2012, 85% de la population résidante permanente étrangère en Suisse provient d'un pays européen. 2/3 de l'UE/AELE.#
+#
+#############################################################################################
+###		Population pays d'Europe et continents#
+#############################################################################################
+#
+data.sub <- melt(data)#
+data.sub$variable <- as.numeric(as.character(data.sub$variable))#
+#
+#pays.sub <- c('Afrique', 'Asie', 'Amérique', 'Allemagne', 'France', 'Italie', 'Portugal', 'Espagne', 'Ex-Yougoslavie')#
+#pays.sub <- c('Allemagne', 'France', 'Italie', 'Portugal', 'Espagne', 'Ex-Yougoslavie')#
+pays.sub <- c('Allemagne','Italie', 'Portugal', 'Espagne', 'Ex-Yougoslavie', 'France', "Autriche",  "Turquie", 'Autre pays européen')#
+#
+pays.sub <- structure(1:length(pays.sub), names = c(pays.sub))#
+facetGroup <- structure(c(1:5, rep(6, 4)), names = names(pays.sub)[c(1:5, rep(9, 4))])#
+# # recompute 'autre pays européen'#
+# data.sub[data.sub[,1] == 'Autre pays européen','value'] <- as.vector(by(data.sub, data.sub$variable, function(dd) {#
+# 	dd[dd[,1] == 'Europe','value'] - sum(dd[dd[,1] %in% names(pays.sub)[-length(pays.sub)],'value'], na.rm = T)#
+# }))#
+#
+data.sub <- data.sub[which(data.sub[,1] %in% names(pays.sub)),]#
+data.sub[,1] <- factor(data.sub[,1], levels = names(pays.sub))#
+data.sub$facetGroup <- factor(names(facetGroup)[match(data.sub[,1], names(pays.sub))], levels = unique(names(facetGroup)))#
+#
+#ggplot(data.sub, aes(variable, value)) + geom_line() + facet_wrap ( ~ Nationalité, nrow = 2) + ggtheme_ygrid#
+ggplot(data.sub, aes(variable, value)) + geom_area(aes(fill = Nationalité), position = 'stack') + ggtheme_ygrid +#
+	xlab("Année") + ylab("Population") + facet_wrap ( ~ facetGroup, nrow = 3) + scale_fill_manual(values = swi_9palette) +#
+	ggtitle("Population d'Europe résidant en Suisse de 1850-2009")#
+dev.off()#
+## ANNOTATIONS#
+# 1. Au début du XXème siècle, Les ressortissants des divers états allemands forment le pourcentage le plus élevé. Il s’agit essentiellement d’ouvriers artisans qui constituent, dans quelques villes, une proportion importante de tailleurs, de cordonniers et de charpentiers. Les Italiens s’imposent de plus en plus, une grande partie d’entre eux s’engage comme terrassiers et manœuvres dans la construction des chemins de fer et des premières usines hydro-électriques#
+# 2.
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger')
+#############################################################################################
+###		SETTINGS#
+#############################################################################################
+#
+source("~/swissinfo/_helpers/helpers.R")#
+font <- "Open Sans"#
+#
+widthFig <- 10#
+heightFig <- widthFig * 1.2#
+#
+#############################################################################################
+###		Plot world map % immigrant foreign born#
+#############################################################################################
+#
+data.file <- 'hs-f-01.01.01.03.csv'#
+data.read <- read.csv(data.file)#
+#
+## Reformat#
+# get rid of the ...#
+for(i in 2:ncol(data.read)) {#
+	data.read[,i] <- as.numeric(as.character(data.read[,i]))#
+}#
+# replace NA with 0#
+data.read[is.na(data.read)] <- 0#
+#
+#rename country#
+data.read[,1] <- gsub(" \\d\\)", "", data.read[,1])#
+# rename columns/year#
+colnames(data.read) <- gsub("^X", "", colnames(data.read))#
+# cluster ex-yougoslavia countries#
+yougo <- c('Yougoslavie', 'Serbie-et-Monténégro', 'Serbie', 'Monténégro', 'Kosovo', 'Croatie', 'Bosnie et Herzégovine','Macédoine')#
+idx <- match(yougo, data.read[,1])#
+stopifnot(all(idx))#
+#
+data <- data.read[-idx,]#
+tmp <- cbind(Nationalité = "Ex-Yougoslavie", as.data.frame(lapply(data.read[idx,2:ncol(data.read)], function(col) sum(col, na.rm = T))))#
+colnames(tmp) <- colnames(data)#
+#
+data <- rbind(data, tmp)#
+#
+pdf("Figures.pdf", width = widthFig, height = heightFig, family = font)#
+#############################################################################################
+###		Population Suisse, Européenne, et non-européenne#
+#############################################################################################
+#
+data.sub <- data#
+data.sub <- data.sub[data.sub[,1] %in% c('Suisse', 'Europe'),]#
+data.sub <- melt(rbind(data.sub, cbind(Nationalité="Non-Européan", data[data[,1] == 'Etranger',-1] - data[data[,1] == 'Europe',-1])))#
+data.sub$variable <- as.numeric(as.character(data.sub$variable))#
+#
+#ggplot(data.sub) + geom_line(aes(variable, value, group = Nationalité, color = Nationalité))#
+g1 <- ggplot(data.sub, aes(variable, value, fill = Nationalité)) + geom_area(position = 'stack') + ggtheme +#
+	xlab("Année") + ylab("Population") + scale_fill_manual(values = swi_9palette[c(2,8,4)]) +#
+	ggtitle("La population résidente en Suisse de 1850-2009") + theme(legend.position = "top")#
+#
+g1#
+g1 + geom_vline(xintercept = 1880, color = "lightgrey")#
+## ANNOTATION#
+# 1. Au XIXe siècle, des millions d'Européens, des centaines de milliers de Suisses ont quitté le Vieux-Continent pour chercher un monde nouveau.#
+# La précarité des conditions de vie et l’insuffisance de la production agricole#
+# 2. C'est seulement vers 1880 que l’immigration d’étrangers vers la Suisse, provenant surtout des pays limitrophes, dépasse l’émigration hors de Suisse#
+# Au début du 20e siècle, 97% des étrangers proviennent des pays voisins (Allemagne, France, Italie, Autriche).#
+# 3. Pour un pays où la politique d'immigration et la question des étrangers est régulièrement , il est bon de mentionner qu'en 2012, 85% de la population résidante permanente étrangère en Suisse provient d'un pays européen. 2/3 de l'UE/AELE.#
+#
+#############################################################################################
+###		Population pays d'Europe et continents#
+#############################################################################################
+#
+data.sub <- melt(data)#
+data.sub$variable <- as.numeric(as.character(data.sub$variable))#
+#
+#pays.sub <- c('Afrique', 'Asie', 'Amérique', 'Allemagne', 'France', 'Italie', 'Portugal', 'Espagne', 'Ex-Yougoslavie')#
+#pays.sub <- c('Allemagne', 'France', 'Italie', 'Portugal', 'Espagne', 'Ex-Yougoslavie')#
+pays.sub <- c('Allemagne','Italie', 'Portugal', 'Espagne', 'Ex-Yougoslavie', 'France', "Autriche",  "Turquie", 'Autre pays européen')#
+#
+pays.sub <- structure(1:length(pays.sub), names = c(pays.sub))#
+facetGroup <- structure(c(1:5, rep(6, 4)), names = names(pays.sub)[c(1:5, rep(9, 4))])#
+# # recompute 'autre pays européen'#
+# data.sub[data.sub[,1] == 'Autre pays européen','value'] <- as.vector(by(data.sub, data.sub$variable, function(dd) {#
+# 	dd[dd[,1] == 'Europe','value'] - sum(dd[dd[,1] %in% names(pays.sub)[-length(pays.sub)],'value'], na.rm = T)#
+# }))#
+#
+data.sub <- data.sub[which(data.sub[,1] %in% names(pays.sub)),]#
+data.sub[,1] <- factor(data.sub[,1], levels = names(pays.sub))#
+data.sub$facetGroup <- factor(names(facetGroup)[match(data.sub[,1], names(pays.sub))], levels = unique(names(facetGroup)))#
+#
+#ggplot(data.sub, aes(variable, value)) + geom_line() + facet_wrap ( ~ Nationalité, nrow = 2) + ggtheme_ygrid#
+ggplot(data.sub, aes(variable, value)) + geom_area(aes(fill = Nationalité), position = 'stack') + ggtheme_ygrid +#
+	xlab("Année") + ylab("Population") + facet_wrap ( ~ facetGroup, nrow = 3) + scale_fill_manual(values = swi_9palette) +#
+	ggtitle("Population d'Europe résidant en Suisse de 1850-2009")#
+dev.off()#
+## ANNOTATIONS#
+# 1. Au début du XXème siècle, Les ressortissants des divers états allemands forment le pourcentage le plus élevé. Il s’agit essentiellement d’ouvriers artisans qui constituent, dans quelques villes, une proportion importante de tailleurs, de cordonniers et de charpentiers. Les Italiens s’imposent de plus en plus, une grande partie d’entre eux s’engage comme terrassiers et manœuvres dans la construction des chemins de fer et des premières usines hydro-électriques#
+# 2.
 setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
 #############################################################################################
 ###		SETTINGS#
@@ -25,7 +385,7 @@ data$Age <- reorder(data$Age, as.numeric(gsub("\\+$", "", as.character(data$Age)
 datan$Age <- as.numeric(gsub("\\+$", "", as.character(datan$Age)))#
 #
 # compute for each year, the proportion of by age group#
-prop <- ddply(data, .(Annee), summarize, #
+prop <- ddply(data, .(Annee), summarize,#
 	Age = Age,#
 	prop = value / sum(value) * 100)#
 #ggplot(data = datan) + geom_histogram(aes(Age, value)) + facet_wrap( ~ Annee) + theme_minimal()#
@@ -33,39 +393,654 @@ prop <- ddply(data, .(Annee), summarize, #
 xlabel <- rep('', nlevels(data$Age))#
 idx.x <- c(seq(min(as.numeric(data$Age)), max(as.numeric(data$Age)), 10), nlevels(data$Age))#
 xlabel[idx.x]<- levels(data$Age)[idx.x]#
-title <- "Proportion de la population Suisse par âge"#
+descr <- paste("proportion de la population suisse par âge (", paste(range(data$Annee), collapse ="-"), ")", sep="")#
+title <- 'Viellissement de la population'#
 #
-plotayear <- function(data, a) {#
-	ghist <- ggplot(data = prop[prop$Annee == a,]) + geom_bar(aes(Age, prop), size =0.01, stat = "identity", color = swi_9palette[3], #
-	fill = swi_9palette[3]) + ggtheme  + scale_x_discrete("", xlabel) + #
+# load logo#
+g <- rasterGrob(swi_logo, interpolate=TRUE)#
+plotayear <- function(data, a, title = "", descr = "") {#
+	ghist <- ggplot(data = prop[prop$Annee == a,]) + geom_bar(aes(Age, prop), size =0.01, stat = "identity",#
+	color = swi_9palette[4], fill = swi_9palette[4]) + ggtheme  + scale_x_discrete("Age", xlabel) +#
 	scale_y_continuous(name = "%", limits = c(0, max(prop$prop)), expand = c(0.01,0.01)) +#
-	geom_text(data = data.frame(x = levels(prop$Age)[nlevels(prop$Age)], y = max(prop$prop)-0.6, label = as.character(a)), #
-	aes(label = label, x = x, y = y), family = font, alpha = 0.4, size = 60,  color = swi_9palette[9], hjust = 1) + #
+	geom_text(data = data.frame(x = levels(prop$Age)[nlevels(prop$Age)], y = max(prop$prop)-0.7, label = as.character(a)),#
+	aes(label = label, x = x, y = y), family = font, alpha = 0.4, size = 50,  color = swi_9palette[9], hjust = 1) +#
 	geom_text(data = data.frame(x = levels(prop$Age)[1],#
-	y = max(prop$prop)-0.05, label = title), aes(label = label, x = x, y = y), family = font, alpha = 1, size = 6, hjust = 0,#
-	fontface ="bold") + theme(axis.text = element_text(size=14, family = font, lineheight = 0))#
-	plot(ghist + annotate("text", x = 1, y = -10, label = "swissinfo.ch"))#
+	y = max(prop$prop), label = title), aes(label = label, x = x, y = y), family = font, alpha = 1, size = 4, hjust = 0,#
+	fontface ="bold") +#
+	geom_text(data = data.frame(x = levels(prop$Age)[1],#
+	y = max(prop$prop)-0.1, label = descr), aes(label = label, x = x, y = y), family = font, alpha = 0.6, size = 4, hjust = 0) +#
+	theme(axis.text = element_text(size = 12, family = font, lineheight = 0), plot.margin = unit(c(0.5,2,2,0), "lines"))#
+	#ghista <- ghist + annotation_custom(grob = textGrob("swissinfo.ch"), xmin = 95, xmax = 100, ymin = -0.3, ymax = -0.3)#
+	ghista <- ghist + annotation_custom(grob = g, xmin = nlevels(prop$Age)-nlevels(prop$Age)/9, xmax = nlevels(prop$Age),#
+	ymin = -0.2, ymax = -0.3)#
+    gt <- ggplot_gtable(ggplot_build(ghista))#
+    gt$layout$clip[gt$layout$name=="panel"] <- "off"#
+	grid.newpage()#
+    grid.draw(gt)#
 }#
 a <- unique(prop$Annee)[10]#
-plotayear(data, a)#
-saveGIF({#
-	for(a in unique(prop$Annee)) {#
-		plotayear(data, a)#
-	}	#
-}, movie.name = "populationAge.gif", interval = 0.1, nmax = 50, ani.width = 900, ani.height = 600)
+plotayear(data, a, title, descr)#
+#
+#filter the data to only have even years#
+data.sub <- data[data$Annee %% 2 ==0,]
 setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
-plotayear <- function(data, a) {#
-	ghist <- ggplot(data = prop[prop$Annee == a,]) + geom_bar(aes(Age, prop), size =0.01, stat = "identity", color = swi_9palette[3], #
-	fill = swi_9palette[3]) + ggtheme  + scale_x_discrete("", xlabel) + #
+plotayear <- function(data, a, title = "", descr = "") {#
+	ghist <- ggplot(data = prop[prop$Annee == a,]) + geom_bar(aes(Age, prop), size =0.01, stat = "identity",#
+	color = swi_9palette[4], fill = swi_9palette[4]) + ggtheme  + scale_x_discrete("Age", xlabel) +#
 	scale_y_continuous(name = "%", limits = c(0, max(prop$prop)), expand = c(0.01,0.01)) +#
-	geom_text(data = data.frame(x = levels(prop$Age)[nlevels(prop$Age)], y = max(prop$prop)-0.6, label = as.character(a)), #
-	aes(label = label, x = x, y = y), family = font, alpha = 0.4, size = 60,  color = swi_9palette[9], hjust = 1) + #
+	geom_text(data = data.frame(x = levels(prop$Age)[nlevels(prop$Age)], y = max(prop$prop)-0.7, label = as.character(a)),#
+	aes(label = label, x = x, y = y), family = font, alpha = 0.4, size = 50,  color = swi_9palette[9], hjust = 1) +#
 	geom_text(data = data.frame(x = levels(prop$Age)[1],#
-	y = max(prop$prop)-0.05, label = title), aes(label = label, x = x, y = y), family = font, alpha = 1, size = 6, hjust = 0,#
-	fontface ="bold") + theme(axis.text = element_text(size=14, family = font, lineheight = 0))#
-	#plot(ghist + annotate("text", x = 1, y = -10, label = "swissinfo.ch"))#
+	y = max(prop$prop), label = title), aes(label = label, x = x, y = y), family = font, alpha = 1, size = 4, hjust = 0,#
+	fontface ="bold") +#
+	geom_text(data = data.frame(x = levels(prop$Age)[1],#
+	y = max(prop$prop)-0.1, label = descr), aes(label = label, x = x, y = y), family = font, alpha = 0.6, size = 4, hjust = 0) +#
+	theme(axis.text = element_text(size = 12, family = font, lineheight = 0), plot.margin = unit(c(0.3,1.5,1.5,0), "lines"))#
+	#ghista <- ghist + annotation_custom(grob = textGrob("swissinfo.ch"), xmin = 95, xmax = 100, ymin = -0.3, ymax = -0.3)#
+	ghista <- ghist + annotation_custom(grob = g, xmin = nlevels(prop$Age)-nlevels(prop$Age)/9, xmax = nlevels(prop$Age),#
+	ymin = -0.2, ymax = -0.3)#
+    gt <- ggplot_gtable(ggplot_build(ghista))#
+    gt$layout$clip[gt$layout$name=="panel"] <- "off"#
+	grid.newpage()#
+    grid.draw(gt)#
 }#
 a <- unique(prop$Annee)[10]#
-plotayear(data, a)
-dev.off()
-dev.off()
+plotayear(data, a, title, descr)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+plotayear <- function(data, a, title = "", descr = "") {#
+	ghist <- ggplot(data = prop[prop$Annee == a,]) + geom_bar(aes(Age, prop), size =0.01, stat = "identity",#
+	color = swi_9palette[4], fill = swi_9palette[4]) + ggtheme  + scale_x_discrete("Age", xlabel) +#
+	scale_y_continuous(name = "%", limits = c(0, max(prop$prop)), expand = c(0.01,0.01)) +#
+	geom_text(data = data.frame(x = levels(prop$Age)[nlevels(prop$Age)], y = max(prop$prop)-0.7, label = as.character(a)),#
+	aes(label = label, x = x, y = y), family = font, alpha = 0.4, size = 50,  color = swi_9palette[9], hjust = 1) +#
+	geom_text(data = data.frame(x = levels(prop$Age)[1],#
+	y = max(prop$prop), label = title), aes(label = label, x = x, y = y), family = font, alpha = 1, size = 4, hjust = 0,#
+	fontface ="bold") +#
+	geom_text(data = data.frame(x = levels(prop$Age)[1],#
+	y = max(prop$prop)-0.1, label = descr), aes(label = label, x = x, y = y), family = font, alpha = 0.6, size = 4, hjust = 0) +#
+	theme(axis.text = element_text(size = 12, family = font, lineheight = 0), plot.margin = unit(c(0.3,1.5,1.5,0), "lines"))#
+	#ghista <- ghist + annotation_custom(grob = textGrob("swissinfo.ch"), xmin = 95, xmax = 100, ymin = -0.3, ymax = -0.3)#
+	ghista <- ghist + annotation_custom(grob = g, xmin = nlevels(prop$Age)-nlevels(prop$Age)/9, xmax = nlevels(prop$Age),#
+	ymin = -0.25, ymax = -0.3)#
+    gt <- ggplot_gtable(ggplot_build(ghista))#
+    gt$layout$clip[gt$layout$name=="panel"] <- "off"#
+	grid.newpage()#
+    grid.draw(gt)#
+}#
+a <- unique(prop$Annee)[10]#
+plotayear(data, a, title, descr)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+plotayear <- function(data, a, title = "", descr = "") {#
+	ghist <- ggplot(data = prop[prop$Annee == a,]) + geom_bar(aes(Age, prop), size =0.01, stat = "identity",#
+	color = swi_9palette[4], fill = swi_9palette[4]) + ggtheme  + scale_x_discrete("Age", xlabel) +#
+	scale_y_continuous(name = "%", limits = c(0, max(prop$prop)), expand = c(0.01,0.01)) +#
+	geom_text(data = data.frame(x = levels(prop$Age)[nlevels(prop$Age)], y = max(prop$prop)-0.7, label = as.character(a)),#
+	aes(label = label, x = x, y = y), family = font, alpha = 0.4, size = 50,  color = swi_9palette[9], hjust = 1) +#
+	geom_text(data = data.frame(x = levels(prop$Age)[1],#
+	y = max(prop$prop), label = title), aes(label = label, x = x, y = y), family = font, alpha = 1, size = 4, hjust = 0,#
+	fontface ="bold") +#
+	geom_text(data = data.frame(x = levels(prop$Age)[1],#
+	y = max(prop$prop)-0.1, label = descr), aes(label = label, x = x, y = y), family = font, alpha = 0.75, size = 4, hjust = 0) +#
+	theme(axis.text = element_text(size = 12, family = font, lineheight = 0), plot.margin = unit(c(0.3,1,1.5,0), "lines"))#
+	#ghista <- ghist + annotation_custom(grob = textGrob("swissinfo.ch"), xmin = 95, xmax = 100, ymin = -0.3, ymax = -0.3)#
+	ghista <- ghist + annotation_custom(grob = g, xmin = nlevels(prop$Age)-nlevels(prop$Age)/9, xmax = nlevels(prop$Age),#
+	ymin = -0.25, ymax = -0.3)#
+    gt <- ggplot_gtable(ggplot_build(ghista))#
+    gt$layout$clip[gt$layout$name=="panel"] <- "off"#
+	grid.newpage()#
+    grid.draw(gt)#
+}#
+a <- unique(prop$Annee)[10]#
+plotayear(data, a, title, descr)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+plotayear <- function(data, a, title = "", descr = "") {#
+	ghist <- ggplot(data = prop[prop$Annee == a,]) + geom_bar(aes(Age, prop), size =0.01, stat = "identity",#
+	color = swi_9palette[4], fill = swi_9palette[4]) + ggtheme  + scale_x_discrete("Age", xlabel) +#
+	scale_y_continuous(name = "%", limits = c(0, max(prop$prop)), expand = c(0.01,0.01)) +#
+	geom_text(data = data.frame(x = levels(prop$Age)[nlevels(prop$Age)], y = max(prop$prop)-0.7, label = as.character(a)),#
+	aes(label = label, x = x, y = y), family = font, alpha = 0.4, size = 50,  color = swi_9palette[9], hjust = 1) +#
+	geom_text(data = data.frame(x = levels(prop$Age)[1],#
+	y = max(prop$prop), label = title), aes(label = label, x = x, y = y), family = font, alpha = 1, size = 4, hjust = 0,#
+	fontface ="bold") +#
+	geom_text(data = data.frame(x = levels(prop$Age)[1],#
+	y = max(prop$prop)-0.1, label = descr), aes(label = label, x = x, y = y), family = font, alpha = 0.75, size = 4, hjust = 0) +#
+	theme(axis.text = element_text(size = 12, family = font, lineheight = 0), plot.margin = unit(c(0.3,1,1.5,0), "lines"))#
+	#ghista <- ghist + annotation_custom(grob = textGrob("swissinfo.ch"), xmin = 95, xmax = 100, ymin = -0.3, ymax = -0.3)#
+	ghista <- ghist + annotation_custom(grob = g, xmin = nlevels(prop$Age)-nlevels(prop$Age)/9, xmax = nlevels(prop$Age),#
+	ymin = -0.25, ymax = -0.35)#
+    gt <- ggplot_gtable(ggplot_build(ghista))#
+    gt$layout$clip[gt$layout$name=="panel"] <- "off"#
+	grid.newpage()#
+    grid.draw(gt)#
+}#
+a <- unique(prop$Annee)[10]#
+plotayear(data, a, title, descr)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+plotayear <- function(data, a, title = "", descr = "") {#
+	ghist <- ggplot(data = prop[prop$Annee == a,]) + geom_bar(aes(Age, prop), size =0.01, stat = "identity",#
+	color = swi_9palette[4], fill = swi_9palette[4]) + ggtheme  + scale_x_discrete("Age", xlabel) +#
+	scale_y_continuous(name = "%", limits = c(0, max(prop$prop)), expand = c(0.01,0.01)) +#
+	geom_text(data = data.frame(x = levels(prop$Age)[nlevels(prop$Age)], y = max(prop$prop)-0.7, label = as.character(a)),#
+	aes(label = label, x = x, y = y), family = font, alpha = 0.4, size = 50,  color = swi_9palette[9], hjust = 1) +#
+	geom_text(data = data.frame(x = levels(prop$Age)[1],#
+	y = max(prop$prop), label = title), aes(label = label, x = x, y = y), family = font, alpha = 1, size = 4, hjust = 0,#
+	fontface ="bold") +#
+	geom_text(data = data.frame(x = levels(prop$Age)[1],#
+	y = max(prop$prop)-0.1, label = descr), aes(label = label, x = x, y = y), family = font, alpha = 0.75, size = 4, hjust = 0) +#
+	theme(axis.text = element_text(size = 12, family = font, lineheight = 0), plot.margin = unit(c(0.3,1,1.5,0), "lines"))#
+	#ghista <- ghist + annotation_custom(grob = textGrob("swissinfo.ch"), xmin = 95, xmax = 100, ymin = -0.3, ymax = -0.3)#
+	ghista <- ghist + annotation_custom(grob = g, xmin = nlevels(prop$Age)-nlevels(prop$Age)/10, xmax = nlevels(prop$Age),#
+	ymin = -0.25, ymax = -0.35)#
+    gt <- ggplot_gtable(ggplot_build(ghista))#
+    gt$layout$clip[gt$layout$name=="panel"] <- "off"#
+	grid.newpage()#
+    grid.draw(gt)#
+}#
+a <- unique(prop$Annee)[10]#
+plotayear(data, a, title, descr)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+#############################################################################################
+###		SETTINGS#
+#############################################################################################
+#
+source("~/swissinfo/_helpers/helpers.R")#
+font <- "Open Sans"#
+#
+library(animation)#
+#
+data.file <- 'contenate_allData.csv'#
+#
+#############################################################################################
+###		Load all data in one data.frame#
+#############################################################################################
+#
+data <- read.csv(data.file, stringsAsFactors = F)#
+colnames(data)[2:ncol(data)] <- gsub("^X", "", colnames(data)[2:ncol(data)])#
+#
+data <- data.frame(Age = data[,1], melt(data[,2:ncol(data)]))#
+colnames(data) <- c('Age', 'Annee', "value")#
+data$Annee <- as.numeric(as.character(data$Annee))#
+datan <- data#
+data$Age <- reorder(data$Age, as.numeric(gsub("\\+$", "", as.character(data$Age))))#
+datan$Age <- as.numeric(gsub("\\+$", "", as.character(datan$Age)))#
+#
+# compute for each year, the proportion of by age group#
+prop <- ddply(data, .(Annee), summarize,#
+	Age = Age,#
+	prop = value / sum(value) * 100)#
+#ggplot(data = datan) + geom_histogram(aes(Age, value)) + facet_wrap( ~ Annee) + theme_minimal()#
+#ggplot(data = prop) + geom_bar(aes(Age, prop), stat = "identity") + facet_wrap( ~ Annee) + theme_minimal()#
+xlabel <- rep('', nlevels(data$Age))#
+idx.x <- c(seq(min(as.numeric(data$Age)), max(as.numeric(data$Age)), 10), nlevels(data$Age))#
+xlabel[idx.x]<- levels(data$Age)[idx.x]#
+descr <- paste("proportion de la population suisse par âge (", paste(range(data$Annee), collapse ="-"), ")", sep="")#
+title <- 'Viellissement de la population'#
+#
+# load logo#
+g <- rasterGrob(swi_logo, interpolate=TRUE)#
+plotayear <- function(data, a, title = "", descr = "") {#
+	ghist <- ggplot(data = prop[prop$Annee == a,]) + geom_bar(aes(Age, prop), size =0.01, stat = "identity",#
+	color = swi_9palette[4], fill = swi_9palette[4]) + ggtheme  + scale_x_discrete("Age", xlabel) +#
+	scale_y_continuous(name = "%", limits = c(0, max(prop$prop)), expand = c(0.01,0.01)) +#
+	geom_text(data = data.frame(x = levels(prop$Age)[nlevels(prop$Age)], y = max(prop$prop)-0.7, label = as.character(a)),#
+	aes(label = label, x = x, y = y), family = font, alpha = 0.4, size = 50,  color = swi_9palette[9], hjust = 1) +#
+	geom_text(data = data.frame(x = levels(prop$Age)[1],#
+	y = max(prop$prop), label = title), aes(label = label, x = x, y = y), family = font, alpha = 1, size = 4, hjust = 0,#
+	fontface ="bold") +#
+	geom_text(data = data.frame(x = levels(prop$Age)[1],#
+	y = max(prop$prop)-0.1, label = descr), aes(label = label, x = x, y = y), family = font, alpha = 0.75, size = 4, hjust = 0) +#
+	theme(axis.text = element_text(size = 12, family = font, lineheight = 0), plot.margin = unit(c(0.3,1,1.5,0), "lines"))#
+	#ghista <- ghist + annotation_custom(grob = textGrob("swissinfo.ch"), xmin = 95, xmax = 100, ymin = -0.3, ymax = -0.3)#
+	ghista <- ghist + annotation_custom(grob = g, xmin = nlevels(prop$Age)-nlevels(prop$Age)/10, xmax = nlevels(prop$Age),#
+	ymin = -0.25, ymax = -0.35)#
+    gt <- ggplot_gtable(ggplot_build(ghista))#
+    gt$layout$clip[gt$layout$name=="panel"] <- "off"#
+	grid.newpage()#
+    grid.draw(gt)#
+}#
+a <- unique(prop$Annee)[10]#
+plotayear(data, a, title, descr)#
+#
+#filter the data to only have even years#
+data.sub <- data[data$Annee %% 2 ==0,]#
+saveGIF({#
+	for(a in unique(data.sub$Annee)) {#
+		plotayear(data.sub, a, title = title, descr)#
+	}#
+}, movie.name = "populationAge.gif", interval = 0.15, nmax = 50, ani.width = 750, ani.height = 500, loop=TRUE, outdir = getwd())
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+plotayear <- function(data, a, title = "", descr = "") {#
+	ghist <- ggplot(data = prop[prop$Annee == a,]) + geom_bar(aes(Age, prop), size =0.01, stat = "identity",#
+	color = swi_9palette[4], fill = swi_9palette[4]) + ggtheme  + scale_x_discrete("Age", xlabel) +#
+	scale_y_continuous(name = "%", limits = c(0, max(prop$prop)), expand = c(0.01,0.01)) +#
+	geom_text(data = data.frame(x = levels(prop$Age)[nlevels(prop$Age)], y = max(prop$prop)-0.7, label = as.character(a)),#
+	aes(label = label, x = x, y = y), family = font, alpha = 0.4, size = 50,  color = swi_9palette[9], hjust = 1) +#
+	geom_text(data = data.frame(x = levels(prop$Age)[1],#
+	y = max(prop$prop), label = title), aes(label = label, x = x, y = y), family = font, alpha = 1, size = 4, hjust = 0,#
+	fontface ="bold") +#
+	geom_text(data = data.frame(x = levels(prop$Age)[1],#
+	y = max(prop$prop)-0.1, label = descr), aes(label = label, x = x, y = y), family = font, alpha = 0.75, size = 4, hjust = 0) +#
+	theme(axis.text = element_text(size = 12, family = font, lineheight = 0), plot.margin = unit(c(0.3,1,1.5,0), "lines"))#
+	#ghista <- ghist + annotation_custom(grob = textGrob("swissinfo.ch"), xmin = 95, xmax = 100, ymin = -0.3, ymax = -0.3)#
+	ghista <- ghist + annotation_custom(grob = g, xmin = nlevels(prop$Age)-nlevels(prop$Age)/10, xmax = nlevels(prop$Age),#
+	ymin = -0.25, ymax = -0.35)#
+    gt <- ggplot_gtable(ggplot_build(ghista))#
+    gt$layout$clip[gt$layout$name=="panel"] <- "off"#
+	grid.newpage()#
+    grid.draw(gt)#
+}#
+a <- unique(prop$Annee)[10]#
+plotayear(data, a, title, descr)#
+#
+#filter the data to only have even years#
+data.sub <- data[data$Annee %% 2 ==0,]#
+saveGIF({#
+	for(a in unique(data.sub$Annee)) {#
+		plotayear(data.sub, a, title = title, descr)#
+	}#
+}, movie.name = "populationAge.gif", interval = 0.15, nmax = 50, ani.width = 900, ani.height = 700, loop=TRUE, outdir = getwd())
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+plotayear <- function(data, a, title = "", descr = "") {#
+	ghist <- ggplot(data = prop[prop$Annee == a,]) + geom_bar(aes(Age, prop), size =0.01, stat = "identity",#
+	color = swi_9palette[4], fill = swi_9palette[4]) + ggtheme  + scale_x_discrete("Age", xlabel) +#
+	scale_y_continuous(name = "%", limits = c(0, max(prop$prop)), expand = c(0.01,0.01)) +#
+	geom_text(data = data.frame(x = levels(prop$Age)[nlevels(prop$Age)], y = max(prop$prop)-0.7, label = as.character(a)),#
+	aes(label = label, x = x, y = y), family = font, alpha = 0.4, size = 50,  color = swi_9palette[9], hjust = 1) +#
+	geom_text(data = data.frame(x = levels(prop$Age)[1],#
+	y = max(prop$prop), label = title), aes(label = label, x = x, y = y), family = font, alpha = 1, size = 4, hjust = 0,#
+	fontface ="bold") +#
+	geom_text(data = data.frame(x = levels(prop$Age)[1],#
+	y = max(prop$prop)-0.1, label = descr), aes(label = label, x = x, y = y), family = font, alpha = 0.75, size = 4, hjust = 0) +#
+	theme(axis.text = element_text(size = 12, family = font, lineheight = 0), plot.margin = unit(c(0.3,1,1.5,0), "lines"))#
+	#ghista <- ghist + annotation_custom(grob = textGrob("swissinfo.ch"), xmin = 95, xmax = 100, ymin = -0.3, ymax = -0.3)#
+	ghista <- ghist + annotation_custom(grob = g, xmin = nlevels(prop$Age)-nlevels(prop$Age)/10, xmax = nlevels(prop$Age),#
+	ymin = -0.25, ymax = -0.35)#
+    gt <- ggplot_gtable(ggplot_build(ghista))#
+    gt$layout$clip[gt$layout$name=="panel"] <- "off"#
+	grid.newpage()#
+    grid.draw(gt)#
+}#
+a <- unique(prop$Annee)[10]#
+plotayear(data, a, title, descr)#
+#
+#filter the data to only have even years#
+data.sub <- data[data$Annee %% 2 ==0,]#
+saveGIF({#
+	for(a in unique(data.sub$Annee)) {#
+		plotayear(data.sub, a, title = title, descr)#
+	}#
+}, movie.name = "populationAge.gif", interval = 0.15, nmax = 50, ani.width = 900, ani.height = 600, loop=TRUE, outdir = getwd())
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+#############################################################################################
+###		SETTINGS#
+#############################################################################################
+#
+source("~/swissinfo/_helpers/helpers.R")#
+font <- "Open Sans"#
+#
+library(animation)#
+#
+data.file <- 'contenate_allData.csv'#
+#
+#############################################################################################
+###		Load all data in one data.frame#
+#############################################################################################
+#
+data <- read.csv(data.file, stringsAsFactors = F)#
+colnames(data)[2:ncol(data)] <- gsub("^X", "", colnames(data)[2:ncol(data)])#
+#
+data <- data.frame(Age = data[,1], melt(data[,2:ncol(data)]))#
+colnames(data) <- c('Age', 'Annee', "value")#
+data$Annee <- as.numeric(as.character(data$Annee))#
+datan <- data#
+data$Age <- reorder(data$Age, as.numeric(gsub("\\+$", "", as.character(data$Age))))#
+datan$Age <- as.numeric(gsub("\\+$", "", as.character(datan$Age)))#
+#
+# compute for each year, the proportion of by age group#
+prop <- ddply(data, .(Annee), summarize,#
+	Age = Age,#
+	prop = value / sum(value) * 100)#
+#ggplot(data = datan) + geom_histogram(aes(Age, value)) + facet_wrap( ~ Annee) + theme_minimal()#
+#ggplot(data = prop) + geom_bar(aes(Age, prop), stat = "identity") + facet_wrap( ~ Annee) + theme_minimal()#
+xlabel <- rep('', nlevels(data$Age))#
+idx.x <- c(seq(min(as.numeric(data$Age)), max(as.numeric(data$Age)), 10), nlevels(data$Age))#
+xlabel[idx.x]<- levels(data$Age)[idx.x]#
+descr <- paste("proportion de la population suisse par âge (", paste(range(data$Annee), collapse ="-"), ")", sep="")#
+title <- 'Viellissement de la population'#
+#
+# load logo#
+g <- rasterGrob(swi_logo, interpolate=TRUE)#
+plotayear <- function(data, a, title = "", descr = "") {#
+	ghist <- ggplot(data = prop[prop$Annee == a,]) + geom_bar(aes(Age, prop), size =0.01, stat = "identity",#
+	color = swi_9palette[4], fill = swi_9palette[4]) + ggtheme  + scale_x_discrete("Age", xlabel) +#
+	scale_y_continuous(name = "%", limits = c(0, max(prop$prop)), expand = c(0.01,0.01)) +#
+	geom_text(data = data.frame(x = levels(prop$Age)[nlevels(prop$Age)], y = max(prop$prop)-0.7, label = as.character(a)),#
+	aes(label = label, x = x, y = y), family = font, alpha = 0.4, size = 50,  color = swi_9palette[9], hjust = 1) +#
+	geom_text(data = data.frame(x = levels(prop$Age)[1],#
+	y = max(prop$prop), label = title), aes(label = label, x = x, y = y), family = font, alpha = 1, size = 4, hjust = 0,#
+	fontface ="bold") +#
+	geom_text(data = data.frame(x = levels(prop$Age)[1],#
+	y = max(prop$prop)-0.1, label = descr), aes(label = label, x = x, y = y), family = font, alpha = 0.75, size = 4, hjust = 0) +#
+	theme(axis.text = element_text(size = 12, family = font, lineheight = 0), plot.margin = unit(c(0.3,1,1.5,0), "lines"))#
+	#ghista <- ghist + annotation_custom(grob = textGrob("swissinfo.ch"), xmin = 95, xmax = 100, ymin = -0.3, ymax = -0.3)#
+	ghista <- ghist + annotation_custom(grob = g, xmin = nlevels(prop$Age)-nlevels(prop$Age)/10, xmax = nlevels(prop$Age),#
+	ymin = -0.2, ymax = -0.3)#
+    gt <- ggplot_gtable(ggplot_build(ghista))#
+    gt$layout$clip[gt$layout$name=="panel"] <- "off"#
+	grid.newpage()#
+    grid.draw(gt)#
+}#
+a <- unique(prop$Annee)[10]#
+plotayear(data, a, title, descr)#
+#
+#filter the data to only have even years#
+data.sub <- data[data$Annee %% 2 ==0,]#
+saveGIF({#
+	for(a in unique(data.sub$Annee)) {#
+		plotayear(data.sub, a, title = title, descr)#
+	}#
+}, movie.name = "populationAge.gif", interval = 0.15, nmax = 50, ani.width = 900, ani.height = 500, loop=TRUE, outdir = getwd())
+plotayear <- function(data, a, title = "", descr = "") {#
+	ghist <- ggplot(data = prop[prop$Annee == a,]) + geom_bar(aes(Age, prop), size =0.01, stat = "identity",#
+	color = swi_9palette[4], fill = swi_9palette[4]) + ggtheme  + scale_x_discrete("Age", xlabel) +#
+	scale_y_continuous(name = "%", limits = c(0, max(prop$prop)), expand = c(0.01,0.01)) +#
+	geom_text(data = data.frame(x = levels(prop$Age)[nlevels(prop$Age)], y = max(prop$prop)-0.7, label = as.character(a)),#
+	aes(label = label, x = x, y = y), family = font, alpha = 0.4, size = 50,  color = swi_9palette[9], hjust = 1) +#
+	geom_text(data = data.frame(x = levels(prop$Age)[1],#
+	y = max(prop$prop), label = title), aes(label = label, x = x, y = y), family = font, alpha = 1, size = 4, hjust = 0,#
+	fontface ="bold") +#
+	geom_text(data = data.frame(x = levels(prop$Age)[1],#
+	y = max(prop$prop)-0.1, label = descr), aes(label = label, x = x, y = y), family = font, alpha = 0.75, size = 4, hjust = 0) +#
+	theme(axis.text = element_text(size = 12, family = font, lineheight = 0), plot.margin = unit(c(0.3,1,1.5,0), "lines"))#
+	#ghista <- ghist + annotation_custom(grob = textGrob("swissinfo.ch"), xmin = 95, xmax = 100, ymin = -0.3, ymax = -0.3)#
+	ghista <- ghist + annotation_custom(grob = g, xmin = nlevels(prop$Age)-nlevels(prop$Age)/10, xmax = nlevels(prop$Age),#
+	ymin = -0.2, ymax = -0.3)#
+    gt <- ggplot_gtable(ggplot_build(ghista))#
+    gt$layout$clip[gt$layout$name=="panel"] <- "off"#
+	grid.newpage()#
+    grid.draw(gt)#
+}#
+a <- unique(prop$Annee)[10]#
+plotayear(data, a, title, descr)#
+#
+#filter the data to only have even years#
+data.sub <- data[data$Annee %% 2 ==0,]#
+saveGIF({#
+	for(a in unique(data.sub$Annee)) {#
+		plotayear(data.sub, a, title = title, descr)#
+	}#
+}, movie.name = "populationAge.gif", interval = 0.15, nmax = 50, ani.width = 900, ani.height = 500, loop=TRUE, outdir = getwd())
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+plotayear <- function(data, a, title = "", descr = "") {#
+	ghist <- ggplot(data = prop[prop$Annee == a,]) + geom_bar(aes(Age, prop), size =0.01, stat = "identity",#
+	color = swi_9palette[4], fill = swi_9palette[4]) + ggtheme  + scale_x_discrete("Age", xlabel) +#
+	scale_y_continuous(name = "%", limits = c(0, max(prop$prop)), expand = c(0.01,0.01)) +#
+	geom_text(data = data.frame(x = levels(prop$Age)[nlevels(prop$Age)], y = max(prop$prop)-0.7, label = as.character(a)),#
+	aes(label = label, x = x, y = y), family = font, alpha = 0.4, size = 50,  color = swi_9palette[9], hjust = 1) +#
+	geom_text(data = data.frame(x = levels(prop$Age)[1],#
+	y = max(prop$prop), label = title), aes(label = label, x = x, y = y), family = font, alpha = 1, size = 4, hjust = 0,#
+	fontface ="bold") +#
+	geom_text(data = data.frame(x = levels(prop$Age)[1],#
+	y = max(prop$prop)-0.1, label = descr), aes(label = label, x = x, y = y), family = font, alpha = 0.75, size = 4, hjust = 0) +#
+	theme(axis.text = element_text(size = 12, family = font, lineheight = 0), plot.margin = unit(c(0.3,1,1.5,0), "lines"))#
+	#ghista <- ghist + annotation_custom(grob = textGrob("swissinfo.ch"), xmin = 95, xmax = 100, ymin = -0.3, ymax = -0.3)#
+	ghista <- ghist + annotation_custom(grob = g, xmin = nlevels(prop$Age)-nlevels(prop$Age)/10, xmax = nlevels(prop$Age),#
+	ymin = -0.2, ymax = -0.3)#
+    gt <- ggplot_gtable(ggplot_build(ghista))#
+    gt$layout$clip[gt$layout$name=="panel"] <- "off"#
+	grid.newpage()#
+    grid.draw(gt)#
+}#
+a <- unique(prop$Annee)[10]#
+plotayear(data, a, title, descr)#
+#
+#filter the data to only have even years#
+data.sub <- data[data$Annee %% 2 ==0,]#
+saveGIF({#
+	for(a in unique(data.sub$Annee)) {#
+		plotayear(data.sub, a, title = title, descr)#
+	}#
+}, movie.name = "populationAge.gif", interval = 0.15, nmax = 50, ani.width = 900, ani.height = 700, loop=TRUE, outdir = getwd())
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+plotayear <- function(data, a, title = "", descr = "") {#
+	ghist <- ggplot(data = prop[prop$Annee == a,]) + geom_bar(aes(Age, prop), size =0.01, stat = "identity",#
+	color = swi_9palette[4], fill = swi_9palette[4]) + ggtheme  + scale_x_discrete("Age", xlabel) +#
+	scale_y_continuous(name = "%", limits = c(0, max(prop$prop)), expand = c(0.01,0.01)) +#
+	geom_text(data = data.frame(x = levels(prop$Age)[nlevels(prop$Age)], y = max(prop$prop)-0.7, label = as.character(a)),#
+	aes(label = label, x = x, y = y), family = font, alpha = 0.4, size = 50,  color = swi_9palette[9], hjust = 1) +#
+	geom_text(data = data.frame(x = levels(prop$Age)[1],#
+	y = max(prop$prop), label = title), aes(label = label, x = x, y = y), family = font, alpha = 1, size = 5, hjust = 0,#
+	fontface ="bold") +#
+	geom_text(data = data.frame(x = levels(prop$Age)[1],#
+	y = max(prop$prop)-0.8, label = descr), aes(label = label, x = x, y = y), family = font, alpha = 0.75, size = 5, hjust = 0) +#
+	theme(axis.text = element_text(size = 14, family = font, lineheight = 0), plot.margin = unit(c(0.3,1,1.5,0), "lines"))#
+	#ghista <- ghist + annotation_custom(grob = textGrob("swissinfo.ch"), xmin = 95, xmax = 100, ymin = -0.3, ymax = -0.3)#
+	ghista <- ghist + annotation_custom(grob = g, xmin = nlevels(prop$Age)-nlevels(prop$Age)/10, xmax = nlevels(prop$Age),#
+	ymin = -0.2, ymax = -0.3)#
+    gt <- ggplot_gtable(ggplot_build(ghista))#
+    gt$layout$clip[gt$layout$name=="panel"] <- "off"#
+	grid.newpage()#
+    grid.draw(gt)#
+}#
+a <- unique(prop$Annee)[10]#
+plotayear(data, a, title, descr)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+plotayear <- function(data, a, title = "", descr = "") {#
+	ghist <- ggplot(data = prop[prop$Annee == a,]) + geom_bar(aes(Age, prop), size =0.01, stat = "identity",#
+	color = swi_9palette[4], fill = swi_9palette[4]) + ggtheme  + scale_x_discrete("Age", xlabel) +#
+	scale_y_continuous(name = "%", limits = c(0, max(prop$prop)), expand = c(0.01,0.01)) +#
+	geom_text(data = data.frame(x = levels(prop$Age)[nlevels(prop$Age)], y = max(prop$prop)-0.7, label = as.character(a)),#
+	aes(label = label, x = x, y = y), family = font, alpha = 0.4, size = 50,  color = swi_9palette[9], hjust = 1) +#
+	geom_text(data = data.frame(x = levels(prop$Age)[1],#
+	y = max(prop$prop), label = title), aes(label = label, x = x, y = y), family = font, alpha = 1, size = 5, hjust = 0,#
+	fontface ="bold") +#
+	geom_text(data = data.frame(x = levels(prop$Age)[1],#
+	y = max(prop$prop)-0.08, label = descr), aes(label = label, x = x, y = y), family = font, alpha = 0.75, size = 5, hjust = 0) +#
+	theme(axis.text = element_text(size = 14, family = font, lineheight = 0), plot.margin = unit(c(0.3,1,1.5,0), "lines"))#
+	#ghista <- ghist + annotation_custom(grob = textGrob("swissinfo.ch"), xmin = 95, xmax = 100, ymin = -0.3, ymax = -0.3)#
+	ghista <- ghist + annotation_custom(grob = g, xmin = nlevels(prop$Age)-nlevels(prop$Age)/10, xmax = nlevels(prop$Age),#
+	ymin = -0.2, ymax = -0.3)#
+    gt <- ggplot_gtable(ggplot_build(ghista))#
+    gt$layout$clip[gt$layout$name=="panel"] <- "off"#
+	grid.newpage()#
+    grid.draw(gt)#
+}#
+a <- unique(prop$Annee)[10]#
+plotayear(data, a, title, descr)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+plotayear <- function(data, a, title = "", descr = "") {#
+	ghist <- ggplot(data = prop[prop$Annee == a,]) + geom_bar(aes(Age, prop), size =0.01, stat = "identity",#
+	color = swi_9palette[4], fill = swi_9palette[4]) + ggtheme  + scale_x_discrete("Age", xlabel) +#
+	scale_y_continuous(name = "%", limits = c(0, max(prop$prop)), expand = c(0.01,0.01)) +#
+	geom_text(data = data.frame(x = levels(prop$Age)[nlevels(prop$Age)], y = max(prop$prop)-0.7, label = as.character(a)),#
+	aes(label = label, x = x, y = y), family = font, alpha = 0.4, size = 50,  color = swi_9palette[9], hjust = 1) +#
+	geom_text(data = data.frame(x = levels(prop$Age)[1],#
+	y = max(prop$prop), label = title), aes(label = label, x = x, y = y), family = font, alpha = 1, size = 5, hjust = 0,#
+	fontface ="bold") +#
+	geom_text(data = data.frame(x = levels(prop$Age)[1],#
+	y = max(prop$prop)-0.082, label = descr), aes(label = label, x = x, y = y), family = font, alpha = 0.75, size = 5, hjust = 0) +#
+	theme(axis.text = element_text(size = 14, family = font, lineheight = 0), plot.margin = unit(c(0.3,1,1.5,0), "lines"))#
+	#ghista <- ghist + annotation_custom(grob = textGrob("swissinfo.ch"), xmin = 95, xmax = 100, ymin = -0.3, ymax = -0.3)#
+	ghista <- ghist + annotation_custom(grob = g, xmin = nlevels(prop$Age)-nlevels(prop$Age)/10, xmax = nlevels(prop$Age),#
+	ymin = -0.2, ymax = -0.3)#
+    gt <- ggplot_gtable(ggplot_build(ghista))#
+    gt$layout$clip[gt$layout$name=="panel"] <- "off"#
+	grid.newpage()#
+    grid.draw(gt)#
+}#
+a <- unique(prop$Annee)[10]#
+plotayear(data, a, title, descr)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+plotayear <- function(data, a, title = "", descr = "") {#
+	ghist <- ggplot(data = prop[prop$Annee == a,]) + geom_bar(aes(Age, prop), size =0.01, stat = "identity",#
+	color = swi_9palette[4], fill = swi_9palette[4]) + ggtheme  + scale_x_discrete("Age", xlabel) +#
+	scale_y_continuous(name = "%", limits = c(0, max(prop$prop)), expand = c(0.01,0.01)) +#
+	geom_text(data = data.frame(x = levels(prop$Age)[nlevels(prop$Age)], y = max(prop$prop)-0.7, label = as.character(a)),#
+	aes(label = label, x = x, y = y), family = font, alpha = 0.4, size = 50,  color = swi_9palette[9], hjust = 1) +#
+	geom_text(data = data.frame(x = levels(prop$Age)[1],#
+	y = max(prop$prop), label = title), aes(label = label, x = x, y = y), family = font, alpha = 1, size = 5, hjust = 0,#
+	fontface ="bold") +#
+	geom_text(data = data.frame(x = levels(prop$Age)[1],#
+	y = max(prop$prop)-0.085, label = descr), aes(label = label, x = x, y = y), family = font, alpha = 0.75, size = 5, hjust = 0) +#
+	theme(axis.text = element_text(size = 14, family = font, lineheight = 0), plot.margin = unit(c(0.3,1,1.5,0), "lines"))#
+	#ghista <- ghist + annotation_custom(grob = textGrob("swissinfo.ch"), xmin = 95, xmax = 100, ymin = -0.3, ymax = -0.3)#
+	ghista <- ghist + annotation_custom(grob = g, xmin = nlevels(prop$Age)-nlevels(prop$Age)/10, xmax = nlevels(prop$Age),#
+	ymin = -0.2, ymax = -0.3)#
+    gt <- ggplot_gtable(ggplot_build(ghista))#
+    gt$layout$clip[gt$layout$name=="panel"] <- "off"#
+	grid.newpage()#
+    grid.draw(gt)#
+}#
+a <- unique(prop$Annee)[10]#
+plotayear(data, a, title, descr)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+plotayear <- function(data, a, title = "", descr = "") {#
+	ghist <- ggplot(data = prop[prop$Annee == a,]) + geom_bar(aes(Age, prop), size =0.01, stat = "identity",#
+	color = swi_9palette[4], fill = swi_9palette[4]) + ggtheme  + scale_x_discrete("Age", xlabel) +#
+	scale_y_continuous(name = "%", limits = c(0, max(prop$prop)), expand = c(0.01,0.01)) +#
+	geom_text(data = data.frame(x = levels(prop$Age)[nlevels(prop$Age)], y = max(prop$prop)-0.7, label = as.character(a)),#
+	aes(label = label, x = x, y = y), family = font, alpha = 0.4, size = 50,  color = swi_9palette[9], hjust = 1) +#
+	geom_text(data = data.frame(x = levels(prop$Age)[1],#
+	y = max(prop$prop), label = title), aes(label = label, x = x, y = y), family = font, alpha = 1, size = 5, hjust = 0,#
+	fontface ="bold") +#
+	geom_text(data = data.frame(x = levels(prop$Age)[1],#
+	y = max(prop$prop)-0.085, label = descr), aes(label = label, x = x, y = y), family = font, alpha = 0.75, size = 5, hjust = 0) +#
+	theme(axis.text = element_text(size = 14, family = font, lineheight = 0), plot.margin = unit(c(0.3,1,1.5,0), "lines"))#
+	#ghista <- ghist + annotation_custom(grob = textGrob("swissinfo.ch"), xmin = 95, xmax = 100, ymin = -0.3, ymax = -0.3)#
+	ghista <- ghist + annotation_custom(grob = g, xmin = nlevels(prop$Age)-nlevels(prop$Age)/10, xmax = nlevels(prop$Age),#
+	ymin = -0.2, ymax = -0.3)#
+    gt <- ggplot_gtable(ggplot_build(ghista))#
+    gt$layout$clip[gt$layout$name=="panel"] <- "off"#
+	grid.newpage()#
+    grid.draw(gt)#
+}#
+a <- unique(prop$Annee)[10]#
+plotayear(data, a, title, descr)#
+#
+#filter the data to only have even years#
+data.sub <- data[data$Annee %% 2 ==0,]#
+saveGIF({#
+	for(a in unique(data.sub$Annee)) {#
+		plotayear(data.sub, a, title = title, descr)#
+	}#
+}, movie.name = "populationAge.gif", interval = 0.15, nmax = 50, ani.width = 900, ani.height = 700, loop=TRUE, outdir = getwd())
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+plotayear <- function(data, a, title = "", descr = "") {#
+	ghist <- ggplot(data = prop[prop$Annee == a,]) + geom_bar(aes(Age, prop), size =0.01, stat = "identity",#
+	color = swi_9palette[4], fill = swi_9palette[4]) + ggtheme  + scale_x_discrete("Age", xlabel) +#
+	scale_y_continuous(name = "%", limits = c(0, max(prop$prop)), expand = c(0.01,0.01)) +#
+	geom_text(data = data.frame(x = levels(prop$Age)[nlevels(prop$Age)], y = max(prop$prop)-0.7, label = as.character(a)),#
+	aes(label = label, x = x, y = y), family = font, alpha = 0.4, size = 50,  color = swi_9palette[9], hjust = 1) +#
+	geom_text(data = data.frame(x = levels(prop$Age)[1],#
+	y = max(prop$prop), label = title), aes(label = label, x = x, y = y), family = font, alpha = 1, size = 5, hjust = 0,#
+	fontface ="bold") +#
+	geom_text(data = data.frame(x = levels(prop$Age)[1],#
+	y = max(prop$prop)-0.085, label = descr), aes(label = label, x = x, y = y), family = font, alpha = 0.75, size = 5, hjust = 0) +#
+	theme(axis.text = element_text(size = 14, family = font, lineheight = 0), plot.margin = unit(c(0.3,1,1.5,0), "lines"))#
+	#ghista <- ghist + annotation_custom(grob = textGrob("swissinfo.ch"), xmin = 95, xmax = 100, ymin = -0.3, ymax = -0.3)#
+	ghista <- ghist + annotation_custom(grob = g, xmin = nlevels(prop$Age)-nlevels(prop$Age)/10, xmax = nlevels(prop$Age),#
+	ymin = -0.2, ymax = -0.3)#
+    gt <- ggplot_gtable(ggplot_build(ghista))#
+    gt$layout$clip[gt$layout$name=="panel"] <- "off"#
+	grid.newpage()#
+    grid.draw(gt)#
+}#
+a <- unique(prop$Annee)[10]#
+plotayear(data, a, title, descr)#
+#
+#filter the data to only have even years#
+data.sub <- data[data$Annee %% 5 ==0,]#
+saveGIF({#
+	for(a in unique(data.sub$Annee)) {#
+		plotayear(data.sub, a, title = title, descr)#
+	}#
+}, movie.name = "populationAge.gif", interval = 0.15, nmax = 50, ani.width = 900, ani.height = 700, loop=TRUE, outdir = getwd())
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+plotayear <- function(data, a, title = "", descr = "") {#
+	ghist <- ggplot(data = prop[prop$Annee == a,]) + geom_bar(aes(Age, prop), size =0.01, stat = "identity",#
+	color = swi_9palette[4], fill = swi_9palette[4]) + ggtheme  + scale_x_discrete("Age", xlabel) +#
+	scale_y_continuous(name = "%", limits = c(0, max(prop$prop)), expand = c(0.01,0.01)) +#
+	geom_text(data = data.frame(x = levels(prop$Age)[nlevels(prop$Age)-3], y = max(prop$prop)-0.7, label = as.character(a)),#
+	aes(label = label, x = x, y = y), family = font, alpha = 0.4, size = 50,  color = swi_9palette[9], hjust = 1) +#
+	geom_text(data = data.frame(x = levels(prop$Age)[1],#
+	y = max(prop$prop), label = title), aes(label = label, x = x, y = y), family = font, alpha = 1, size = 5, hjust = 0,#
+	fontface ="bold") +#
+	geom_text(data = data.frame(x = levels(prop$Age)[1],#
+	y = max(prop$prop)-0.085, label = descr), aes(label = label, x = x, y = y), family = font, alpha = 0.75, size = 5, hjust = 0) +#
+	theme(axis.text = element_text(size = 14, family = font, lineheight = 0), plot.margin = unit(c(0.3,1,1.5,0), "lines"))#
+	#ghista <- ghist + annotation_custom(grob = textGrob("swissinfo.ch"), xmin = 95, xmax = 100, ymin = -0.3, ymax = -0.3)#
+	ghista <- ghist + annotation_custom(grob = g, xmin = nlevels(prop$Age)-nlevels(prop$Age)/10, xmax = nlevels(prop$Age),#
+	ymin = -0.2, ymax = -0.3)#
+    gt <- ggplot_gtable(ggplot_build(ghista))#
+    gt$layout$clip[gt$layout$name=="panel"] <- "off"#
+	grid.newpage()#
+    grid.draw(gt)#
+}#
+a <- unique(prop$Annee)[10]#
+plotayear(data, a, title, descr)#
+#
+#filter the data to only have even years#
+data.sub <- data[data$Annee %% 4 ==0,]#
+saveGIF({#
+	for(a in unique(data.sub$Annee)) {#
+		plotayear(data.sub, a, title = title, descr)#
+	}#
+}, movie.name = "populationAge.gif", interval = 0.2, nmax = 50, ani.width = 900, ani.height = 700, loop=TRUE, outdir = getwd())
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+plotayear <- function(data, a, title = "", descr = "") {#
+	browser()#
+	ghist <- ggplot(data = prop[prop$Annee == a,]) + geom_bar(aes(Age, prop), size =0.01, stat = "identity",#
+		color = swi_9palette[4], fill = swi_9palette[4]) + ggtheme  + scale_x_discrete("Age", xlabel) +#
+		scale_y_continuous(name = "%", limits = c(0, max(prop$prop)), expand = c(0.01,0.01)) +#
+		geom_text(data = data.frame(x = levels(prop$Age)[nlevels(prop$Age)-10], y = max(prop$prop)-0.7, label = as.character(a)),#
+		aes(label = label, x = x, y = y), family = font, alpha = 0.4, size = 50,  color = swi_9palette[9], hjust = 1) +#
+		geom_text(data = data.frame(x = levels(prop$Age)[1],#
+		y = max(prop$prop), label = title), aes(label = label, x = x, y = y), family = font, alpha = 1, size = 5, hjust = 0,#
+		fontface ="bold") +#
+		geom_text(data = data.frame(x = levels(prop$Age)[1],#
+		y = max(prop$prop)-0.085, label = descr), aes(label = label, x = x, y = y), family = font, alpha = 0.75, size = 5, hjust = 0) +#
+		theme(axis.text = element_text(size = 14, family = font, lineheight = 0), plot.margin = unit(c(0.3,1,1.5,0), "lines"))#
+	#ghista <- ghist + annotation_custom(grob = textGrob("swissinfo.ch"), xmin = 95, xmax = 100, ymin = -0.3, ymax = -0.3)#
+	ghist <- ghist +#
+	ghista <- ghist + annotation_custom(grob = g, xmin = nlevels(prop$Age)-nlevels(prop$Age)/10, xmax = nlevels(prop$Age),#
+	ymin = -0.2, ymax = -0.3)#
+    gt <- ggplot_gtable(ggplot_build(ghista))#
+    gt$layout$clip[gt$layout$name=="panel"] <- "off"#
+	grid.newpage()#
+    grid.draw(gt)#
+}#
+a <- unique(prop$Annee)[10]#
+plotayear(data, a, title, descr)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+ghist <- ggplot(data = prop[prop$Annee == a,]) + geom_bar(aes(Age, prop), size =0.01, stat = "identity",#
+		color = swi_9palette[4], fill = swi_9palette[4]) + ggtheme  + scale_x_discrete("Age", xlabel) +#
+		scale_y_continuous(name = "%", limits = c(0, max(prop$prop)), expand = c(0.01,0.01)) +#
+		geom_text(data = data.frame(x = levels(prop$Age)[nlevels(prop$Age)-10], y = max(prop$prop)-0.7, label = as.character(a)),#
+		aes(label = label, x = x, y = y), family = font, alpha = 0.4, size = 50,  color = swi_9palette[9], hjust = 1) +#
+		geom_text(data = data.frame(x = levels(prop$Age)[1],#
+		y = max(prop$prop), label = title), aes(label = label, x = x, y = y), family = font, alpha = 1, size = 5, hjust = 0,#
+		fontface ="bold") +#
+		geom_text(data = data.frame(x = levels(prop$Age)[1],#
+		y = max(prop$prop)-0.085, label = descr), aes(label = label, x = x, y = y), family = font, alpha = 0.75, size = 5, hjust = 0) +#
+		theme(axis.text = element_text(size = 14, family = font, lineheight = 0), plot.margin = unit(c(0.3,1,1.5,0), "lines"))
+ghist
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+ghist <- ggplot(data = prop[prop$Annee == a,]) + geom_bar(aes(Age, prop), size =0.01, stat = "identity",#
+		color = swi_9palette[4], fill = swi_9palette[4]) + ggtheme  + scale_x_discrete("Age", xlabel) +#
+		scale_y_continuous(name = "%", limits = c(0, max(prop$prop)), expand = c(0.01,0.01)) +#
+		geom_text(data = data.frame(x = levels(prop$Age)[nlevels(prop$Age)-10], y = max(prop$prop)-0.7, label = as.character(a)),#
+		aes(label = label, x = x, y = y), family = font, alpha = 0.4, size = 50,  color = swi_9palette[9], hjust = 1) +#
+		geom_text(data = data.frame(x = levels(prop$Age)[1],#
+		y = max(prop$prop), label = title), aes(label = label, x = x, y = y), family = font, alpha = 1, size = 5, hjust = 0,#
+		fontface ="bold") +#
+		geom_text(data = data.frame(x = levels(prop$Age)[1],#
+		y = max(prop$prop)-0.085, label = descr), aes(label = label, x = x, y = y), family = font, alpha = 0.75, size = 5, hjust = 0) +#
+		theme(axis.text = element_text(size = 14, family = font, lineheight = 0), plot.margin = unit(c(0.3,1,1.5,0), "lines"))
+ghist
+ghist
+prop
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+dd <- prop[prop$Annee == a,]
+dd
+str(data)
+str(prop)
