@@ -3,7 +3,6 @@
 ############################################################################################
 
 source("~/swissinfo/_helpers/helpers.R")
-font <- "Open Sans"
 
 widthFig <- 10
 heightFig <- widthFig * 1.2
@@ -60,7 +59,7 @@ g1 + geom_vline(xintercept = 1880, color = "lightgrey")
 # La précarité des conditions de vie et l’insuffisance de la production agricole
 # 2. C'est seulement vers 1880 que l’immigration d’étrangers vers la Suisse, provenant surtout des pays limitrophes, dépasse l’émigration hors de Suisse
 # Au début du 20e siècle, 97% des étrangers proviennent des pays voisins (Allemagne, France, Italie, Autriche).
-# 3. Pour un pays où la politique d'immigration et la question des étrangers est régulièrement , il est bon de mentionner qu'en 2012, 85% de la population résidante permanente étrangère en Suisse provient d'un pays européen. 2/3 de l'UE/AELE.
+# 3. En Suisse où la politique d'immigration et la question des étrangers est régulièrement débattue, il est bon de mentionner qu'en 2012, 85% de la population résidante permanente étrangère en Suisse provient d'un pays européen. 2/3 de l'UE/AELE.
 
 ############################################################################################
 ###		Population pays d'Europe et continents
@@ -68,6 +67,10 @@ g1 + geom_vline(xintercept = 1880, color = "lightgrey")
 
 data.sub <- melt(data)
 data.sub$variable <- as.numeric(as.character(data.sub$variable))
+
+#
+by(data.sub, data.sub$variable, function(dd) (dd[dd$Nationalité == "Allemagne", 'value'] /  dd[dd$Nationalité == "Total ", 'value']) * 100)
+
 
 #pays.sub <- c('Afrique', 'Asie', 'Amérique', 'Allemagne', 'France', 'Italie', 'Portugal', 'Espagne', 'Ex-Yougoslavie')
 #pays.sub <- c('Allemagne', 'France', 'Italie', 'Portugal', 'Espagne', 'Ex-Yougoslavie')
@@ -87,7 +90,12 @@ data.sub$facetGroup <- factor(names(facetGroup)[match(data.sub[,1], names(pays.s
 #ggplot(data.sub, aes(variable, value)) + geom_line() + facet_wrap ( ~ Nationalité, nrow = 2) + ggtheme_ygrid
 ggplot(data.sub, aes(variable, value)) + geom_area(aes(fill = Nationalité), position = 'stack') + ggtheme_ygrid +
 	xlab("Année") + ylab("Population") + facet_wrap ( ~ facetGroup, nrow = 3) + scale_fill_manual(values = swi_9palette) +
-	ggtitle("Population d'Europe résidant en Suisse de 1850-2009")
+	ggtitle("Population d'Europe résidant en Suisse de 1850-2009") + paneltheme
+
+ggplot(data.sub, aes(variable / 100, value)) + geom_area(aes(fill = Nationalité), position = 'stack') + ggtheme_ygrid +
+	facet_wrap ( ~ facetGroup, nrow = 3) + scale_fill_manual(values = swi_9palette) + scale_x_continuous("Année", labels=function(x) x*100) +
+	ggtitle("Population d'Europe résidant en Suisse de 1850-2009") + paneltheme + scale_y_continuous("Population", labels=function(x) x/1000)
+
 dev.off()
 ## ANNOTATIONS
 # 1. Au début du XXème siècle, Les ressortissants des divers états allemands forment le pourcentage le plus élevé. Il s’agit essentiellement d’ouvriers artisans qui constituent, dans quelques villes, une proportion importante de tailleurs, de cordonniers et de charpentiers. Les Italiens s’imposent de plus en plus, une grande partie d’entre eux s’engage comme terrassiers et manœuvres dans la construction des chemins de fer et des premières usines hydro-électriques

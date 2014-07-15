@@ -3,18 +3,24 @@
 
 ## Structure
 
-##### Immigration
+### Immigration
 
-* Si la Suisse est historiquement depuis le XVème siècle un pays d'immigration. elle est devenue de plus en plus multiculturelle ces 20 dernières années. En 2013, elle avait un des pourcentages de la population née à l'étranger le plus élevé d' Europe avec 28.9%, soit plus d'une personne sur 4. A titre de comparaison d'autres pays traditionnelement d'immigration comme les Etats-Unis et le Canada ont un taux de la population totale née à l'étranger de 14.3 et 20.7%
+* Si la Suisse est historiquement un pays d'immigration. elle est devenue de plus en plus multiculturelle ces 20 dernières années. En 2013, elle avait un des pourcentages de la population née à l'étranger le plus élevé d' Europe avec 28.9%, soit plus d'une personne sur 4. A titre de comparaison d'autres pays traditionnelement d'immigration comme les Etats-Unis et le Canada ont un taux de la population totale née à l'étranger de 14.3 et 20.7%
 * **Graphique**
 	1. ~~Evolution de la population née à l'étranger (1990-2010) Suisse et autres pays** ([oecd](/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger/302012021T006.XLS))~~
 	1. **Population née à l'étranger en Europe [UN](/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger/UN_MigrantStock_europe2013_iso2.csv) [datawrapperEmbed](http://dw-swissinfo.s3-website-us-west-2.amazonaws.com/mJhVt/2/)**
 * [BFS2005](/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger/Population_2005_f.pdf)
-* 
+
+
+
 * **Graphique: Evolution de la population permanente (1850-2010), chiffres absolus et par nationalité** ([bfs](/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger/hs-f-01.01.01.03.xls))
-	*  *La précarité des conditions de vie et l’insuffisance de la production agricole ont longtemps forcé une part importante de la population à chercher ailleurs les moyens d’exister. L’émigration était intense lors des périodes de disette. Des conditions plus favorables créent l’amorce de la transition démographique au XVIIIe. Le nombre d’habitants est de 1,7 million vers 1800, voisin de 3 millions autour de 1880. C’est à cette époque que l’immigration d’étrangers vers la Suisse, provenant surtout des pays limitrophes, dépasse l’émigration hors de Suisse. La Suisse dénombre 3,3 millions de résidents en 1900* [LETEMPS](http://www.letemps.ch/Page/Uuid/a9a73ed2-2587-11e0-9473-c5f5084e58c6/Brève_histoire_de_la_population_suisse_un_territoire_constamment_surpeuplé)
-* *Le débat en Suisse sur l'immigration et les étrangers n'est certainement pas nouveau. Si dernièrement une certaine grogne s'est manifestée en Suisse envers l' importante immigration des pays limitotrophes de la Suisse (comme l'Allemagne). On peut constater que leur nombre est equivalent à plus d'un siècle!*
-* 
+	1.  Au XIXe siècle, en raison des conditions de vie difficiles et une faible production agricole, des millions d'Européens, des centaines de milliers de Suisses ont quitté le Vieux-Continent. C'est seulement autour de 1880 que l'immigration d'étrangers vers la Suisse des pays limitotrophes dépasse l'émigration. Les industriels manquant alors d'ouvriers font appel à des travailleurs étrangers.
+	1. En 1900, 97% des étrangers proviennent des pays voisins (Allemagne, France, Italie, Autriche).
+	1. Dès 1950, une importante immigration est rendue nécessaire de par la pénurie de main d'œuvre suisse et pour la réalisation des grands chantiers (tunnels, barrages et autoroutes, ainsi que construction en général). Italie, Espagne, Portugal.
+	1. 
+	* [LETEMPS](http://www.letemps.ch/Page/Uuid/a9a73ed2-2587-11e0-9473-c5f5084e58c6/Brève_histoire_de_la_population_suisse_un_territoire_constamment_surpeuplé)
+* *Le débat en Suisse sur l'immigration et les étrangers n'est certainement pas nouveau. Si une certaine grogne s'est manifestée en Suisse dernièrement envers l'importante immigration des pays voisins de la Suisse, en particulier  l'Allemagne. On peut constater que leur nombre est equivalent à plus d'un siècle!*
+* [Formation de la population résidente par nationalité](http://cf.datawrapper.de/ApPuw/4/)
 * Articles
 	* [bfs](http://www.bfs.admin.ch/bfs/portal/fr/index/dienstleistungen/forumschule/them/02/03a.html)
 	* [oecd](http://www.oecd-ilibrary.org/sites/factbook-2013-en/01/02/01/index.html?itemId=/content/chapter/factbook-2013-6-en)
