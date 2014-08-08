@@ -46,14 +46,30 @@ data.sub <- data
 data.sub <- data.sub[data.sub[,1] %in% c('Suisse', 'Europe'),]
 data.sub <- melt(rbind(data.sub, cbind(Nationalité="Non-Européan", data[data[,1] == 'Etranger',-1] - data[data[,1] == 'Europe',-1])))
 data.sub$variable <- as.numeric(as.character(data.sub$variable))
+data.sub$facet <- 'area'
+data.sub$pc <- NA
+
+etranger.pc <- tapply(data.sub$value, data.sub$variable, function(tt) (sum(tt[2:3], na.rm =T) / sum(tt)) * 100)
+etranger.pc <- data.frame(Nationalité = NA, variable = as.numeric(rownames(etranger.pc)), value = NA, facet = "line", pc = as.vector(etranger.pc))
+data.sub2 <- rbind(data.sub, etranger.pc)
 
 #ggplot(data.sub) + geom_line(aes(variable, value, group = Nationalité, color = Nationalité))
 g1 <- ggplot(data.sub, aes(variable, value, fill = Nationalité)) + geom_area(position = 'stack') + ggtheme +
-	xlab("Année") + ylab("Population") + scale_fill_manual(values = swi_9palette[c(2,8,4)]) +
+	xlab("Année") + ylab("Population") + scale_fill_manual(values = swi_9palette[c(2,8,4,5)]) +
 	ggtitle("La population résidente en Suisse de 1850-2009") + theme(legend.position = "top")
 
 g1
 g1 + geom_vline(xintercept = 1880, color = "lightgrey")
+
+
+
+ggplot(data = data.sub2) + geom_area(aes(variable, value, fill = Nationalité), position = 'stack') + ggtheme +
+	xlab("Année") + ylab("Population") + scale_fill_manual(values = swi_9palette[c(2,8,4,5)]) +
+	ggtitle("La population résidente en Suisse de 1850-2009") + theme(legend.position = "top") +
+	geom_line(aes(variable, pc)) + facet_wrap (~ facet, nrow = 2, scales = "free_y")
+
+
+
 ## ANNOTATION
 # 1. Au XIXe siècle, des millions d'Européens, des centaines de milliers de Suisses ont quitté le Vieux-Continent pour chercher un monde nouveau.
 # La précarité des conditions de vie et l’insuffisance de la production agricole

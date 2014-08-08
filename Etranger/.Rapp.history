@@ -6,8 +6,12 @@ setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulation
 source("~/swissinfo/_helpers/helpers.R")#
 #
 widthFig <- 10#
-heightFig <- widthFig * 1.2
-setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger')
+heightFig <- widthFig * 1.2#
+#
+#############################################################################################
+###		Plot world map % immigrant foreign born#
+#############################################################################################
+#
 data.file <- 'hs-f-01.01.01.03.csv'#
 data.read <- read.csv(data.file)#
 #
@@ -32,8 +36,13 @@ data <- data.read[-idx,]#
 tmp <- cbind(Nationalité = "Ex-Yougoslavie", as.data.frame(lapply(data.read[idx,2:ncol(data.read)], function(col) sum(col, na.rm = T))))#
 colnames(tmp) <- colnames(data)#
 #
-data <- rbind(data, tmp)
-setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger')
+data <- rbind(data, tmp)#
+#
+pdf("Figures.pdf", width = widthFig, height = heightFig, family = font)#
+#############################################################################################
+###		Population Suisse, Européenne, et non-européenne#
+#############################################################################################
+#
 data.sub <- data#
 data.sub <- data.sub[data.sub[,1] %in% c('Suisse', 'Europe'),]#
 data.sub <- melt(rbind(data.sub, cbind(Nationalité="Non-Européan", data[data[,1] == 'Etranger',-1] - data[data[,1] == 'Europe',-1])))#
@@ -46,8 +55,17 @@ g1 <- ggplot(data.sub, aes(variable, value, fill = Nationalité)) + geom_area(po
 #
 g1#
 g1 + geom_vline(xintercept = 1880, color = "lightgrey")#
-## ANNOTATION
-setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger')
+## ANNOTATION#
+# 1. Au XIXe siècle, des millions d'Européens, des centaines de milliers de Suisses ont quitté le Vieux-Continent pour chercher un monde nouveau.#
+# La précarité des conditions de vie et l’insuffisance de la production agricole#
+# 2. C'est seulement vers 1880 que l’immigration d’étrangers vers la Suisse, provenant surtout des pays limitrophes, dépasse l’émigration hors de Suisse#
+# Au début du 20e siècle, 97% des étrangers proviennent des pays voisins (Allemagne, France, Italie, Autriche).#
+# 3. En Suisse où la politique d'immigration et la question des étrangers est régulièrement débattue, il est bon de mentionner qu'en 2012, 85% de la population résidante permanente étrangère en Suisse provient d'un pays européen. 2/3 de l'UE/AELE.#
+#
+#############################################################################################
+###		Population pays d'Europe et continents#
+#############################################################################################
+#
 data.sub <- melt(data)#
 data.sub$variable <- as.numeric(as.character(data.sub$variable))#
 #
@@ -74,53 +92,45 @@ ggplot(data.sub, aes(variable, value)) + geom_area(aes(fill = Nationalité), pos
 	ggtitle("Population d'Europe résidant en Suisse de 1850-2009") + paneltheme#
 #
 ggplot(data.sub, aes(variable / 100, value)) + geom_area(aes(fill = Nationalité), position = 'stack') + ggtheme_ygrid +#
-	facet_wrap ( ~ facetGroup, nrow = 3) + scale_fill_manual(values = swi_9palette) + scale_x_continuous("Année") +#
-	ggtitle("Population d'Europe résidant en Suisse de 1850-2009") + paneltheme + scale_y_continuous("Population", labels=function(x) x/1000)
-setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger')
-ggplot(data.sub, aes(variable / 100, value)) + geom_area(aes(fill = Nationalité), position = 'stack') + ggtheme_ygrid +#
-	facet_wrap ( ~ facetGroup, nrow = 3) + scale_fill_manual(values = swi_9palette) + scale_x_continuous("Année") +#
-	ggtitle("Population d'Europe résidant en Suisse de 1850-2009") + paneltheme + scale_y_continuous("Population", labels=function(x) x/10)
-setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger')
-ggplot(data.sub, aes(variable, value)) + geom_area(aes(fill = Nationalité), position = 'stack') + ggtheme_ygrid +#
-	xlab("Année") + ylab("Population") + facet_wrap ( ~ facetGroup, nrow = 3) + scale_fill_manual(values = swi_9palette) +#
-	ggtitle("Population d'Europe résidant en Suisse de 1850-2009") + paneltheme
-setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger')
-ggplot(data.sub, aes(variable / 100, value)) + geom_area(aes(fill = Nationalité), position = 'stack') + ggtheme_ygrid +#
-	facet_wrap ( ~ facetGroup, nrow = 3) + scale_fill_manual(values = swi_9palette) + scale_x_continuous("Année") +#
-	ggtitle("Population d'Europe résidant en Suisse de 1850-2009") + paneltheme + scale_y_continuous("Population", labels=function(x) x/10)
-setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger')
-ggplot(data.sub, aes(variable, value)) + geom_area(aes(fill = Nationalité), position = 'stack') + ggtheme_ygrid +#
-	xlab("Année") + ylab("Population") + facet_wrap ( ~ facetGroup, nrow = 3) + scale_fill_manual(values = swi_9palette) +#
-	ggtitle("Population d'Europe résidant en Suisse de 1850-2009") + paneltheme#
-#
-ggplot(data.sub, aes(variable / 100, value)) + geom_area(aes(fill = Nationalité), position = 'stack') + ggtheme_ygrid +#
-	facet_wrap ( ~ facetGroup, nrow = 3) + scale_fill_manual(values = swi_9palette) + scale_x_continuous("Année") +#
-	ggtitle("Population d'Europe résidant en Suisse de 1850-2009") + paneltheme + scale_y_continuous("Population", labels=function(x) x/1000)
-setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger')
-ggplot(data.sub, aes(variable, value)) + geom_area(aes(fill = Nationalité), position = 'stack') + ggtheme_ygrid +#
-	xlab("Année") + ylab("Population") + facet_wrap ( ~ facetGroup, nrow = 3) + scale_fill_manual(values = swi_9palette) +#
-	ggtitle("Population d'Europe résidant en Suisse de 1850-2009") + paneltheme#
-#
-ggplot(data.sub, aes(variable / 100, value)) + geom_area(aes(fill = Nationalité), position = 'stack') + ggtheme_ygrid +#
-	facet_wrap ( ~ facetGroup, nrow = 3) + scale_fill_manual(values = swi_9palette) + scale_x_continuous("Année") +#
-	ggtitle("Population d'Europe résidant en Suisse de 1850-2009") + paneltheme + scale_y_continuous("Population", labels=function(x) x/1000)
-setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger')
-ggplot(data.sub, aes(variable, value)) + geom_area(aes(fill = Nationalité), position = 'stack') + ggtheme_ygrid +#
-	xlab("Année") + ylab("Population") + facet_wrap ( ~ facetGroup, nrow = 3) + scale_fill_manual(values = swi_9palette) +#
-	ggtitle("Population d'Europe résidant en Suisse de 1850-2009") + paneltheme
-setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger')
-ggplot(data.sub, aes(variable / 100, value)) + geom_area(aes(fill = Nationalité), position = 'stack') + ggtheme_ygrid +#
-	facet_wrap ( ~ facetGroup, nrow = 3) + scale_fill_manual(values = swi_9palette) + scale_x_continuous("Année", labels=function(x) x) +#
-	ggtitle("Population d'Europe résidant en Suisse de 1850-2009") + paneltheme + scale_y_continuous("Population", labels=function(x) x/1000)
+	facet_wrap ( ~ facetGroup, nrow = 3) + scale_fill_manual(values = swi_9palette) + scale_x_continuous("Année", labels=function(x) x*100) +#
+	ggtitle("Population d'Europe résidant en Suisse de 1850-2009") + paneltheme + scale_y_continuous("Population", labels=function(x) x/1000)#
+dev.off()#
+## ANNOTATIONS#
+# 1. Au début du XXème siècle, Les ressortissants des divers états allemands forment le pourcentage le plus élevé. Il s’agit essentiellement d’ouvriers artisans qui constituent, dans quelques villes, une proportion importante de tailleurs, de cordonniers et de charpentiers. Les Italiens s’imposent de plus en plus, une grande partie d’entre eux s’engage comme terrassiers et manœuvres dans la construction des chemins de fer et des premières usines hydro-électriques#
+# 2.
 setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger')
 ggplot(data.sub, aes(variable / 100, value)) + geom_area(aes(fill = Nationalité), position = 'stack') + ggtheme_ygrid +#
 	facet_wrap ( ~ facetGroup, nrow = 3) + scale_fill_manual(values = swi_9palette) + scale_x_continuous("Année", labels=function(x) x*100) +#
 	ggtitle("Population d'Europe résidant en Suisse de 1850-2009") + paneltheme + scale_y_continuous("Population", labels=function(x) x/1000)
-setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger')
-ggplot(data.sub, aes(variable, value)) + geom_area(aes(fill = Nationalité), position = 'stack') + ggtheme_ygrid +#
-	xlab("Année") + ylab("Population") + facet_wrap ( ~ facetGroup, nrow = 3) + scale_fill_manual(values = swi_9palette) +#
-	ggtitle("Population d'Europe résidant en Suisse de 1850-2009") + paneltheme
-setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger')
+setwd('/Users/nguyendu/Google Drive/swissinfo/_helpers')
+paneltheme <- {#
+	theme(strip.background = element_rect(colour = "black", fill = "white", size = 1),#
+		strip.text = element_text(colour = "black", hjust = 0.1, family = font))#
+}
+ggplot(data.sub, aes(variable / 100, value)) + geom_area(aes(fill = Nationalité), position = 'stack') + ggtheme_ygrid +#
+	facet_wrap ( ~ facetGroup, nrow = 3) + scale_fill_manual(values = swi_9palette) + scale_x_continuous("Année", labels=function(x) x*100) +#
+	ggtitle("Population d'Europe résidant en Suisse de 1850-2009") + paneltheme + scale_y_continuous("Population", labels=function(x) x/1000)
+setwd('/Users/nguyendu/Google Drive/swissinfo/_helpers')
+paneltheme <- {#
+	theme(strip.background = element_rect(colour = "black", fill = "white", size = 0.5),#
+		strip.text = element_text(colour = "black", hjust = 0.1, family = font))#
+}
+ggplot(data.sub, aes(variable / 100, value)) + geom_area(aes(fill = Nationalité), position = 'stack') + ggtheme_ygrid +#
+	facet_wrap ( ~ facetGroup, nrow = 3) + scale_fill_manual(values = swi_9palette) + scale_x_continuous("Année", labels=function(x) x*100) +#
+	ggtitle("Population d'Europe résidant en Suisse de 1850-2009") + paneltheme + scale_y_continuous("Population", labels=function(x) x/1000)
+setwd('/Users/nguyendu/Google Drive/swissinfo/_helpers')
+paneltheme <- {#
+	theme(strip.background = element_rect(colour = "black", fill = "white", size = 0.1),#
+		strip.text = element_text(colour = "black", hjust = 0.1, family = font))#
+}
+ggplot(data.sub, aes(variable / 100, value)) + geom_area(aes(fill = Nationalité), position = 'stack') + ggtheme_ygrid +#
+	facet_wrap ( ~ facetGroup, nrow = 3) + scale_fill_manual(values = swi_9palette) + scale_x_continuous("Année", labels=function(x) x*100) +#
+	ggtitle("Population d'Europe résidant en Suisse de 1850-2009") + paneltheme + scale_y_continuous("Population", labels=function(x) x/1000)
+setwd('/Users/nguyendu/Google Drive/swissinfo/_helpers')
+paneltheme <- {#
+	theme(strip.background = element_rect(colour = "white", fill = "white", size = 0.1),#
+		strip.text = element_text(colour = "black", hjust = 0.1, family = font))#
+}
 ggplot(data.sub, aes(variable / 100, value)) + geom_area(aes(fill = Nationalité), position = 'stack') + ggtheme_ygrid +#
 	facet_wrap ( ~ facetGroup, nrow = 3) + scale_fill_manual(values = swi_9palette) + scale_x_continuous("Année", labels=function(x) x*100) +#
 	ggtitle("Population d'Europe résidant en Suisse de 1850-2009") + paneltheme + scale_y_continuous("Population", labels=function(x) x/1000)

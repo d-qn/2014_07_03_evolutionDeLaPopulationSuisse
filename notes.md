@@ -5,23 +5,28 @@
 
 ### Immigration
 
-* Si la Suisse est historiquement un pays d'immigration. elle est devenue de plus en plus multiculturelle ces 20 dernières années. En 2013, elle avait un des pourcentages de la population née à l'étranger le plus élevé d' Europe avec 28.9%, soit plus d'une personne sur 4. A titre de comparaison d'autres pays traditionnelement d'immigration comme les Etats-Unis et le Canada ont un taux de la population totale née à l'étranger de 14.3 et 20.7%
+* Si la Suisse est historiquement un pays d'immigration. elle est devenue de plus en plus multiculturelle ces 20 dernières années. En 2013, elle avait un des pourcentages de la population née à l'étranger le plus élevé d'Europe avec 28.9%, soit plus d'une personne sur 4. A titre de comparaison d'autres pays traditionnelement d'immigration comme les Etats-Unis et le Canada ont un taux de la population totale née à l'étranger de 14.3 et 20.7%
 * **Graphique**
 	1. ~~Evolution de la population née à l'étranger (1990-2010) Suisse et autres pays** ([oecd](/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger/302012021T006.XLS))~~
 	1. **Population née à l'étranger en Europe [UN](/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger/UN_MigrantStock_europe2013_iso2.csv) [datawrapperEmbed](http://dw-swissinfo.s3-website-us-west-2.amazonaws.com/mJhVt/2/)**
-* [BFS2005](/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger/Population_2005_f.pdf)
+  * [BFS2005](/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger/Population_2005_f.pdf)
 
 
+ 
 
-* **Graphique: Evolution de la population permanente (1850-2010), chiffres absolus et par nationalité** ([bfs](/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger/hs-f-01.01.01.03.xls))
+
+* Les graphiques ci-dessous présentent l'évolution de la population résidente en Suisse selon la nationalité
+* **Graphique: Evolution de la population permanente (1850-2010), chiffres absolus** ([bfs](/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger/hs-f-01.01.01.03.xls))
 	1.  Au XIXe siècle, en raison des conditions de vie difficiles et une faible production agricole, des millions d'Européens, des centaines de milliers de Suisses ont quitté le Vieux-Continent. C'est seulement autour de 1880 que l'immigration d'étrangers vers la Suisse des pays limitotrophes dépasse l'émigration. Les industriels manquant alors d'ouvriers font appel à des travailleurs étrangers.
 	1. En 1900, 97% des étrangers proviennent des pays voisins (Allemagne, France, Italie, Autriche).
-	1. Dès 1950, une importante immigration est rendue nécessaire de par la pénurie de main d'œuvre suisse et pour la réalisation des grands chantiers (tunnels, barrages et autoroutes, ainsi que construction en général). Italie, Espagne, Portugal.
-	1. 
-	* [LETEMPS](http://www.letemps.ch/Page/Uuid/a9a73ed2-2587-11e0-9473-c5f5084e58c6/Brève_histoire_de_la_population_suisse_un_territoire_constamment_surpeuplé)
-* *Le débat en Suisse sur l'immigration et les étrangers n'est certainement pas nouveau. Si une certaine grogne s'est manifestée en Suisse dernièrement envers l'importante immigration des pays voisins de la Suisse, en particulier  l'Allemagne. On peut constater que leur nombre est equivalent à plus d'un siècle!*
-* [Formation de la population résidente par nationalité](http://cf.datawrapper.de/ApPuw/4/)
+	1. Dès 1950, une importante immigration est rendue nécessaire de par la pénurie de main d'œuvre suisse et pour la réalisation des grands chantiers (tunnels, barrages et autoroutes, ainsi que construction en général).
+	1. Si aujourd'hui comme hier, le débat sur l'immigration et le nombre des étrangers revient fréquemment. Il faut relever qu'en 2013 ceux qu'on appelle les étrangers dans les statistiques étaient à x% des ressortissants Européen, le x% des pays limitotrophes de la Suisse.  
+* **Graphique: Evolution de la population permanente (1850-2010), chiffres absolus et par nationalité** 
+  * Si une certaine grogne s'est manifestée en Suisse dernièrement envers l'importante immigration des pays voisins de la Suisse, en particulier  l'Allemagne. On peut constater que leur nombre est equivalent à plus d'un siècle!
+  * L'importante immigration dès 1950 pour les grand
+* ** Graphique DW [Formation de la population résidente par nationalité](http://cf.datawrapper.de/ApPuw/4/)*** 
 * Articles
+    * [LETEMPS](http://www.letemps.ch/Page/Uuid/a9a73ed2-2587-11e0-9473-c5f5084e58c6/Brève_histoire_de_la_population_suisse_un_territoire_constamment_surpeuplé)
 	* [bfs](http://www.bfs.admin.ch/bfs/portal/fr/index/dienstleistungen/forumschule/them/02/03a.html)
 	* [oecd](http://www.oecd-ilibrary.org/sites/factbook-2013-en/01/02/01/index.html?itemId=/content/chapter/factbook-2013-6-en)
 	* [guardian](http://www.theguardian.com/news/datablog/2010/sep/07/immigration-europe-foreign-citizens#_)
