@@ -1,0 +1,28 @@
+"Population résidante selon Canton (-) / District (>>) / Commune"
+"(......), Année, Sexe, Etat civil et Lieu de naissance"
+
+" "	" "	"Sexe - Total"
+" "	" "	"Etat civil - Total"
+" "	" "	"Lieu de naissance - Total"
+"Suisse"
+" "	"2010"	7940969
+" "	"2011"	8035391
+" "	"2012"	8123721
+" "	"2013"	8222327
+
+"Métainformation: "
+"Dernière modification: nouvelles données (année 2013) "
+"Date de l'enquête: 31 décembre "
+"Référence spatiale: communes au 14.04.2013 "
+"Statistique de la population et des ménages "
+"((http://www.bfs.admin.ch/bfs/portal/fr/index/infothek/erhebungen__qu-"
+"ellen/blank/blank/statpop/01.html TARGET=_blank) STATPOP) "
+"(http://www.bfs.admin.ch/bfs/portal/fr/index/infothek/erhebungen__que-"
+"llen/blank/blank/statpop/02.html TARGET=_blank) Définition de la "
+"population résidante permanente "
+" "
+
+"Sans indication = partenariat dissous dont on ignore si la "
+"dissolution est due à une séparation juridique ou à un décès du "
+"partenaire."
+

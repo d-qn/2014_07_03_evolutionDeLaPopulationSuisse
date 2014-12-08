@@ -5,6 +5,7 @@
 
 ### Immigration
 
+* Les étrangers en Suisse est un thème qui alimente régulièrement le débat politique. 
 * Si la Suisse est historiquement un pays d'immigration. elle est devenue de plus en plus multiculturelle ces 20 dernières années. En 2013, elle avait un des pourcentages de la population née à l'étranger le plus élevé d'Europe avec 28.9%, soit plus d'une personne sur 4. A titre de comparaison d'autres pays traditionnelement d'immigration comme les Etats-Unis et le Canada ont un taux de la population totale née à l'étranger de 14.3 et 20.7%
 * **Graphique**
 	1. ~~Evolution de la population née à l'étranger (1990-2010) Suisse et autres pays** ([oecd](/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger/302012021T006.XLS))~~
@@ -15,15 +16,16 @@
  
 
 
-* Les graphiques ci-dessous présentent l'évolution de la population résidente en Suisse selon la nationalité
+* Si l'immigration la Suisse 
 * **Graphique: Evolution de la population permanente (1850-2010), chiffres absolus** ([bfs](/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger/hs-f-01.01.01.03.xls))
-	1.  Au XIXe siècle, en raison des conditions de vie difficiles et une faible production agricole, des millions d'Européens, des centaines de milliers de Suisses ont quitté le Vieux-Continent. C'est seulement autour de 1880 que l'immigration d'étrangers vers la Suisse des pays limitotrophes dépasse l'émigration. Les industriels manquant alors d'ouvriers font appel à des travailleurs étrangers.
+	1.  Au XIXe siècle, en raison des conditions de vie difficiles et une faible production agricole, des millions d'Européens, des centaines de milliers de Suisses ont quitté le Vieux-Continent. C'est seulement autour de 1880 que l'immigration d'étrangers vers la Suisse des pays limitotrophes dépasse l'émigration. Les industriels manquant alors d'ouvriers font appel à des travailleurs étrangers [letemps](http://www.letemps.ch/Page/Uuid/a9a73ed2-2587-11e0-9473-c5f5084e58c6/Brève_histoire_de_la_population_suisse_un_territoire_constamment_surpeuplé).
 	1. En 1900, 97% des étrangers proviennent des pays voisins (Allemagne, France, Italie, Autriche).
 	1. Dès 1950, une importante immigration est rendue nécessaire de par la pénurie de main d'œuvre suisse et pour la réalisation des grands chantiers (tunnels, barrages et autoroutes, ainsi que construction en général).
 	1. Si aujourd'hui comme hier, le débat sur l'immigration et le nombre des étrangers revient fréquemment. Il faut relever qu'en 2013 ceux qu'on appelle les étrangers dans les statistiques étaient à x% des ressortissants Européen, le x% des pays limitotrophes de la Suisse.  
 * **Graphique: Evolution de la population permanente (1850-2010), chiffres absolus et par nationalité** 
-  * Si une certaine grogne s'est manifestée en Suisse dernièrement envers l'importante immigration des pays voisins de la Suisse, en particulier  l'Allemagne. On peut constater que leur nombre est equivalent à plus d'un siècle!
-  * L'importante immigration dès 1950 pour les grand
+  * Si une certaine grogne s'est manifestée en Suisse dernièrement envers l'importante immigration des pays voisins de la Suisse, en particulier  d'Allemagne. On peut constater que leur nombre est equivalent à il y a plus d'un siècle!
+  * Après la deuxième guerre mondiale, de nombreux italiens sont engagés comme ouvriers dans la construction des chemins de fer et dans les premières usines hydro-électriques.
+  * Dans la moitié des années 60, une politique d’intégration et d’assimilation des étrangers est mise en place. Le séjour durable des travailleurs étrangers est facilité, notamment en autorisant plus largement le regroupement familial.
 * ** Graphique DW [Formation de la population résidente par nationalité](http://cf.datawrapper.de/ApPuw/4/)*** 
 * Articles
     * [LETEMPS](http://www.letemps.ch/Page/Uuid/a9a73ed2-2587-11e0-9473-c5f5084e58c6/Brève_histoire_de_la_population_suisse_un_territoire_constamment_surpeuplé)
@@ -35,14 +37,14 @@
 ##### Viellissement et natalité
 * Malgré une immigration importante et principalement jeune, la Suisse connaît comme tous les pays développés un vieillissement important de sa population.
 * **Graphique: Bar gif population par âge (bfs)** 
-* En 1860, la Suisse comptait X personnes de moins de 20 ans et 10 personnes de 65 ans ou plus pour 100 personnes. En 2012, comptait X personnes de moins de 20 ans et 10 personnes de 65 ans ou plus pour 100 personnes
-	
+* En 1860, la Suisse comptait 12 personnes entre 20 et 64 ans pour change persone de plus de 65 ans. Aujourd'hui, on ne compte plus que 4 adultes entre 20 et 64 ans pour chanque personne 65 ans et plus. 	
 * Contrairement à une idée reçue, ce n'est pas tant l'augmentation de l'espérance de vie que la baisse de la natalité qui est la source principale du viellissement de la population
 
 * **Graphiques**
   * 	** Line graph life expectancy (WB)**
   * 	** Line graph ferility rates (WB)**
-		
+  * 1/3 des enfants nés d'une mère étrangère
+		http://www.swissinfo.ch/eng/a-third-of-babies-born-to-foreign-mothers/40808518
 	  
 ##### Famille
 

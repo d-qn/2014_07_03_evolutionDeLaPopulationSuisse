@@ -1,236 +1,424 @@
+require( rCharts )#
+options(RCHART_TEMPLATE = 'Rickshaw.html')#
+#specify the data#
+data = data.frame(#
+c( 0, 1, 2, 3 ),#
+c( 40, 49, 17, 42 ),#
+stringsAsFactors = FALSE#
+)#
+colnames(data) <- c("x","y")#
+#build the plot#
+r1 <- Rickshaw$new()#
+r1$layer(#
+y ~ x,#
+data = data,#
+type = "area",#
+colors= "steelblue",#
+height = 240,#
+width = 540#
+)#
+#turn off all the nice built in features#
+#to match the sparse first example#
+r1$set(#
+hoverDetail = FALSE,#
+xAxis = FALSE,#
+yAxis = FALSE,#
+shelving = FALSE,#
+legend = FALSE,#
+slider = FALSE,#
+highlight = FALSE#
+)
+data <- read.csv("data/data2.csv", stringsAsFactors = FALSE)#
+#build the plot#
+r2 <- Rickshaw$new()#
+r2$layer(#
+y ~ x,#
+data = data,#
+type = "area",#
+colors= "steelblue",#
+height = 240,#
+width = 540#
+)#
+#turn off all the nice built in features#
+#to match the sparse second example#
+r2$set(#
+hoverDetail = FALSE,#
+xAxis = FALSE,#
+yAxis = FALSE,#
+shelving = FALSE,#
+legend = FALSE,#
+slider = FALSE,#
+highlight = FALSE#
+)
+p1 <- nPlot(mpg ~ wt, group = 'cyl', data = mtcars, type = 'scatterChart')#
+p1$xAxis(axisLabel = 'Weight')#
+p1
+## {title: MultiBar Chart}#
+hair_eye = as.data.frame(HairEyeColor)#
+p2 <- nPlot(Freq ~ Hair, group = 'Eye', data = subset(hair_eye, Sex == "Female"), type = 'multiBarChart')#
+p2$chart(color = c('brown', 'blue', '#594c26', 'green'))#
+p2#
+## {title: MultiBar Horizontal Chart}#
+p3 <- nPlot(~ cyl, group = 'gear', data = mtcars, type = 'multiBarHorizontalChart')#
+p3$chart(showControls = F)#
+p3#
+## {title: Pie Chart}#
+p4 <- nPlot(~ cyl, data = mtcars, type = 'pieChart')#
+p4#
+## {title: Donut Chart}#
+p5 <- nPlot(~ cyl, data = mtcars, type = 'pieChart')#
+p5$chart(donut = TRUE)#
+p5#
+## {title: Line Chart}#
+data(economics, package = 'ggplot2')#
+p6 <- nPlot(uempmed ~ date, data = economics, type = 'lineChart')#
+p6#
+## {title: Line with Focus Chart }#
+ecm <- reshape2::melt(economics[,c('date', 'uempmed', 'psavert')], id = 'date')#
+p7 <- nPlot(value ~ date, group = 'variable', data = ecm, type = 'lineWithFocusChart')#
+#test format dates on the xAxis#
+#also good test of javascript functions as parameters#
+#dates from R to JSON will come over as number of days since 1970-01-01#
+#so convert to milliseconds 86400000 in a day and then format with d3#
+#on lineWithFocusChart type xAxis will also set x2Axis unless it is specified#
+p7$xAxis( tickFormat="#!function(d) {return d3.time.format('%b %Y')(new Date( d * 86400000 ));}!#" )#
+#test xAxis also sets x2Axis#
+p7#
+#now test setting x2Axis to something different#
+#test format dates on the x2Axis#
+#test to show %Y format which is different than xAxis#
+p7$x2Axis( tickFormat="#!function(d) {return d3.time.format('%Y')(new Date( d * 86400000 ));}!#" )#
+p7#
+#test set xAxis again to make sure it does not override set x2Axis#
+p7$xAxis( NULL, replace = T)#
+p7
+require( rCharts )
+?options
+require( rCharts )#
+options(RCHART_TEMPLATE = 'Rickshaw.html')#
+#specify the data#
+data = data.frame(#
+  c( 0, 1, 2, 3 ),#
+  c( 40, 49, 17, 42 ),#
+  stringsAsFactors = FALSE#
+)#
+colnames(data) <- c("x","y")#
+#build the plot#
+r1 <- Rickshaw$new()#
+r1$layer(#
+  y ~ x,#
+  data = data,#
+  type = "area",#
+  colors= "steelblue",#
+  height = 240,#
+  width = 540#
+)#
+#turn off all the nice built in features#
+#to match the sparse first example#
+r1$set(#
+  hoverDetail = FALSE,#
+  xAxis = FALSE,#
+  yAxis = FALSE,#
+  shelving = FALSE,#
+  legend = FALSE,#
+  slider = FALSE,#
+  highlight = FALSE#
+)#
+#r1
+r1
+# Example 2#
+require(rCharts)#
+# options(RCHART_TEMPLATE = 'Rickshaw.html')#
+require(RColorBrewer)#
+data(economics, package = 'ggplot2')#
+datm = reshape2::melt(#
+  economics[,c('date', 'psavert', 'uempmed')],#
+  id = 'date'#
+)#
+datm <- transform(datm, date = to_jsdate(date))#
+p2 <- Rickshaw$new()#
+p2$layer(value ~ date, group = 'variable', data = datm, type = 'line', #
+  colors = c("darkred", "darkslategrey"))
+p2
+to_jsdate <- function(date_){#
+  val = as.POSIXct(as.Date(date_),origin="1970-01-01")#
+  as.numeric(val)#
+}#
+p3 <- Rickshaw$new()#
+p3$layer(Employed ~ Year, data = longley, type = 'line', colors = c('darkred'))#
+#
+usp = reshape2::melt(USPersonalExpenditure)#
+p4 <- Rickshaw$new()#
+p4$layer(value ~ Var2, group = 'Var1', data = usp, type = 'area')#
+p4$show(T)#
+#
+dat <- yaml::yaml.load('[ { x: 0, y: 40 }, { x: 1, y: 49 }, { x: 2, y: 17 }, { x: 3, y: 42 } ]')#
+#
+dat <- data.frame(#
+  x = c(0, 1, 2, 3),#
+  y = c(40, 49, 2, 17)#
+)
+# Example 1#
+p1 <- Rickshaw$new()#
+p1$layer(~ cyl, group = 'am', data = mtcars, type = 'bar')#
+#
+# Example 2#
+require(rCharts)#
+# options(RCHART_TEMPLATE = 'Rickshaw.html')#
+require(RColorBrewer)#
+data(economics, package = 'ggplot2')#
+datm = reshape2::melt(#
+  economics[,c('date', 'psavert', 'uempmed')],#
+  id = 'date'#
+)#
+datm <- transform(datm, date = to_jsdate(date))#
+p2 <- Rickshaw$new()#
+p2$layer(value ~ date, group = 'variable', data = datm, type = 'line', #
+  colors = c("darkred", "darkslategrey"))
+p2
+to_jsdate <- function(date_){#
+  val = as.POSIXct(as.Date(date_),origin="1970-01-01")#
+  as.numeric(val)#
+}#
+p3 <- Rickshaw$new()#
+p3$layer(Employed ~ Year, data = longley, type = 'line', colors = c('darkred'))#
+#
+usp = reshape2::melt(USPersonalExpenditure)#
+p4 <- Rickshaw$new()#
+p4$layer(value ~ Var2, group = 'Var1', data = usp, type = 'area')#
+p4$show(T)
+library(pXr)
+library(pXR)
+library(pxR)
+library(pxr)
+library(pXR)
+library(pXr)
+library(pxR)
+library(ggplot2)
+install.packages(pxR)
+install.packages("pxR")
+library(pxR)
+px<- read.px("~/Downloads/ilc_di01.px")
+px
+px<- read.px("~/Downloads/ilc_di01.px")
+?read.px
+px<- read.px("~/Downloads/ilc_di01.px")
+source('https://raw.githubusercontent.com/walkerke/teaching-with-datavis/master/pyramids/rcharts_pyramids.R')
+## Script to generate population pyramids from the Census Bureau's International Database with rCharts ###
+#
+library(XML)#
+library(reshape2)#
+library(rCharts)#
+library(plyr)#
+getAgeTable <- function(country, year) {#
+  c1 <- "http://www.census.gov/population/international/data/idb/region.php?N=%20Results%20&T=10&A=separate&RT=0&Y="  #
+  c2 <- "&R=-1&C="#
+  yrs <- gsub(" ", "", toString(year))#
+  url <- paste0(c1, yrs, c2, country)#
+  df <- data.frame(readHTMLTable(url))#
+  nms <- c("Year", "Age", "total", "Male", "Female", "percent", "pctMale", "pctFemale", "sexratio")  #
+  names(df) <- nms  #
+  cols <- c(1, 3:9)#
+  df[,cols] <- apply(df[,cols], 2, function(x) as.numeric(as.character(gsub(",", "", x))))#
+  df <- df[df$Age != 'Total', ]  #
+  ord <- 1:nrow(df)#
+  df <- cbind(df, ord)#
+  return(df)#
+}
+dPyramid <- function(country, year, colors=NULL) {#
+  dat <- getAgeTable(country, year)#
+  dat$Male <- -1 * dat$Male#
+  keep <- c("Year", "Age", "Male", "Female", "ord")#
+  dat.sub <- dat[,keep]#
+  dat.melt <- melt(dat.sub, #
+                   value.name='Population', #
+                   variable.name = 'Gender', #
+                   id.vars=c('Age', 'ord', 'Year') )#
+  dat.melt$gencode <- ifelse(dat.melt$Gender == 'Male', 1, 2)#
+  d1 <- dPlot(#
+    x = "Population", #
+    y = "Age", #
+    groups = "Gender", #
+    data = dat.melt, #
+    type = 'bar')#
+  d1$yAxis(type = "addCategoryAxis", orderRule = "ord")#
+  d1$xAxis(type = "addMeasureAxis")#
+  d1$legend( x = 60, y = 10, width = 700, height = 20, horizontalAlign = "right")#
+  if (!is.null(colors)){#
+    d1$colorAxis(#
+      type = "addColorAxis", #
+      colorSeries = "gencode", #
+      palette = colors#
+    )#
+  }#
+  if (length(year) > 1) {#
+    d1$set(storyboard = "Year")#
+    max_x <- round_any(max(dat.melt$Population), 10000, f = ceiling)#
+    min_x <- round_any(min(dat.melt$Population), 10000, f = floor)#
+    d1$xAxis(overrideMax = max_x, overrideMin = min_x)#
+  }#
+  if (max(dat.melt$Population >= 1000000)) {#
+    d1$setTemplate( afterScript = #
+                      "#
+                  <script>#
+                    x._getFormat = function () {#
+                    return function(d) {#
+                    return d3.format(',.1f')(Math.abs(d) / 1000000) + 'm';#
+                     };#
+                    };#
+                  myChart.draw()#
+                  </script>#
+                  ")#
+  } else {#
+    d1$setTemplate( afterScript = #
+                      "#
+                  <script>#
+                    x._getFormat = function () {#
+                    return function(d) {#
+                    return d3.format(',.0f')(Math.abs(d) / 1000) + 'k';#
+                     };#
+                    };#
+                  myChart.draw()#
+                  </script>#
+                  ")#
+  }#
+#
+  d1#
+}
+d1
+dPyramid
+dPyramid('GM', seq(2000, 2050, 10), colors = c('black', 'red'))
+# Initialize libraries required#
+library(rCharts)#
+library(reshape2)#
+meansconferences=read.csv("https://raw.github.com/patilv/ESPNBball/master/meansconferences.csv")#
+# Mean statistics for all WCC and Big 12 teams for seasons 2001-2002 through 2012-2013  #
+# mean Points.Per.Game, mean Games.Played, mean Minutes,mean Rebounds.Per.Game, mean Assists.Per.Game, mean Steals.Per.Game,mean Blocks.Per.Game,#
+# mean Turnovers.Per.Game, mean Field.Goal.Percent, mean Free.Throw.Percent, mean Three.Point.FieldGoal.Percent#
+# For more info on how this dataset was generated, #
+# please see blog post at http://analyticsandvisualization.blogspot.com/2013/08/short-tales-of-two-ncaa-basketball.html#
+meltmeansconferences=melt(meansconferences[-c(1,10:14)], id.vars=c("Conference","Year")) # Remove the first irrelevant index column and few additional ones to keep this clean#
+# Horizontal Stacked bars chart 100% Storyboard#
+d1=dPlot(y="Year", x="value",data=meltmeansconferences, groups="variable",type="bar") # looking at the entire data instead of subset#
+d1$yAxis(type="addCategoryAxis", orderRule="Year")#
+d1$xAxis(type="addPctAxis") # instead of addMeasureAxis used in the Horizontal Stacked Bar#
+d1$set(storyboard = "Conference") # chart changes by conference#
+d1$legend(#
+  x = 0,#
+  y = 0,#
+  width = 500,#
+  height = 75,#
+  horizontalAlign = "right"#
+)
+# Initialize libraries required#
+library(rCharts)#
+library(reshape2)#
+meansconferences=read.csv("https://raw.github.com/patilv/ESPNBball/master/meansconferences.csv")
+library(rCharts)#
+library(reshape2)#
+meansconferences=read.csv("https://raw.github.com/patilv/ESPNBball/master/meansconferences.csv")
+require(XML)
+xmlParse("~/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger/ink/area_swissVsForeigners copy.svg")
+xml<- xmlParse("~/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger/ink/area_swissVsForeigners copy.svg")
+str(xml)
+xml
+?saveXML
+xmlAttrs(xml)
+xml
+xmlSize(r)
+xmlSize(xml)
+xmlName(xml)
+xml[[1]]
+str(xml)
+xm<- xmlParse("~/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger/ink/area_swissVsForeigners copy.svg")
+str(xm)
+xm
+xmlRoot(xml)
+xmlRoot(xm)
+test<- xmlRoot(xm)
+str(test)
+xmlAttrs(test)
+xmlName(test)
+test
+xmltop<- xmlRoot(xm)
+xmlName(xmltop)
+xmlSize(xmltop)
+xmlName(xmltop[[1]])
+xmlName(xmltop[[2]])
+xmlName(xmltop[[3]])
+xmlName(xmltop[[4]])
+xmlName(xmltop[[5]])
+xmlInternalTreeParse(xm)
+xmlInternalTreeParse("~/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger/ink/area_swissVsForeigners copy.svg")
+xm<- xmlInternalTreeParse("~/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger/ink/area_swissVsForeigners copy.svg")
+str(xm)
+?xpathApply
 setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger')
 #############################################################################################
 ###		SETTINGS#
 #############################################################################################
 #
 source("~/swissinfo/_helpers/helpers.R")#
-#
-widthFig <- 10#
-heightFig <- widthFig * 1.2#
+font <- "Open Sans"#
 #
 #############################################################################################
 ###		Plot world map % immigrant foreign born#
 #############################################################################################
 #
-data.file <- 'hs-f-01.01.01.03.csv'#
+data.file <- 'UN_MigrantStock_country2013.csv'#
 data.read <- read.csv(data.file)#
+data.read$iso2 <- countrycode(data.read[,2], origin = "iso3n", destination = "iso2c")#
+data.read$continent <- countrycode(data.read[,'iso2'], origin = "iso2c", destination = "continent")#
+# for countries with no match, match the name#
+#idx <- which(is.na(data.read$iso2))#
+#data.read[idx,'iso2']<- countrycode(data.read[idx,1], origin = "country.name", destination = "iso2c")#
 #
-## Reformat#
-# get rid of the ...#
-for(i in 2:ncol(data.read)) {#
-	data.read[,i] <- as.numeric(as.character(data.read[,i]))#
-}#
-# replace NA with 0#
-data.read[is.na(data.read)] <- 0#
+# Remove Holy See#
+data.read <- data.read[which(data.read$iso2 != 'VA'),]#
 #
-#rename country#
-data.read[,1] <- gsub(" \\d\\)", "", data.read[,1])#
-# rename columns/year#
-colnames(data.read) <- gsub("^X", "", colnames(data.read))#
-# cluster ex-yougoslavia countries#
-yougo <- c('Yougoslavie', 'Serbie-et-Monténégro', 'Serbie', 'Monténégro', 'Kosovo', 'Croatie', 'Bosnie et Herzégovine','Macédoine')#
-idx <- match(yougo, data.read[,1])#
-stopifnot(all(idx))#
-#
-data <- data.read[-idx,]#
-tmp <- cbind(Nationalité = "Ex-Yougoslavie", as.data.frame(lapply(data.read[idx,2:ncol(data.read)], function(col) sum(col, na.rm = T))))#
-colnames(tmp) <- colnames(data)#
-#
-data <- rbind(data, tmp)#
-#
-pdf("Figures.pdf", width = widthFig, height = heightFig, family = font)#
-#############################################################################################
-###		Population Suisse, Européenne, et non-européenne#
-#############################################################################################
-#
-data.sub <- data#
-data.sub <- data.sub[data.sub[,1] %in% c('Suisse', 'Europe'),]#
-data.sub <- melt(rbind(data.sub, cbind(Nationalité="Non-Européan", data[data[,1] == 'Etranger',-1] - data[data[,1] == 'Europe',-1])))#
-data.sub$variable <- as.numeric(as.character(data.sub$variable))#
-#
-#ggplot(data.sub) + geom_line(aes(variable, value, group = Nationalité, color = Nationalité))#
-g1 <- ggplot(data.sub, aes(variable, value, fill = Nationalité)) + geom_area(position = 'stack') + ggtheme +#
-	xlab("Année") + ylab("Population") + scale_fill_manual(values = swi_9palette[c(2,8,4)]) +#
-	ggtitle("La population résidente en Suisse de 1850-2009") + theme(legend.position = "top")#
-#
-g1#
-g1 + geom_vline(xintercept = 1880, color = "lightgrey")#
-## ANNOTATION#
-# 1. Au XIXe siècle, des millions d'Européens, des centaines de milliers de Suisses ont quitté le Vieux-Continent pour chercher un monde nouveau.#
-# La précarité des conditions de vie et l’insuffisance de la production agricole#
-# 2. C'est seulement vers 1880 que l’immigration d’étrangers vers la Suisse, provenant surtout des pays limitrophes, dépasse l’émigration hors de Suisse#
-# Au début du 20e siècle, 97% des étrangers proviennent des pays voisins (Allemagne, France, Italie, Autriche).#
-# 3. En Suisse où la politique d'immigration et la question des étrangers est régulièrement débattue, il est bon de mentionner qu'en 2012, 85% de la population résidante permanente étrangère en Suisse provient d'un pays européen. 2/3 de l'UE/AELE.#
+write.table(data.read, file="UN_MigrantStock_country2013_iso2.csv", sep=",", row.names = F)#
+write.table(data.read[which(data.read$continent == 'Europe'),], file="UN_MigrantStock_europe2013_iso2.csv", sep=",", row.names = F)#
 #
 #############################################################################################
-###		Population pays d'Europe et continents#
+###		Plot evolution of the foreign born population (as a percentage of the total population)#
 #############################################################################################
 #
-data.sub <- melt(data)#
-data.sub$variable <- as.numeric(as.character(data.sub$variable))#
-#
-##
-by(data.sub, data.sub$variable, function(dd) (dd[dd$Nationalité == "Allemagne", 'value'] /  dd[dd$Nationalité == "Total ", 'value']) * 100)#
-#pays.sub <- c('Afrique', 'Asie', 'Amérique', 'Allemagne', 'France', 'Italie', 'Portugal', 'Espagne', 'Ex-Yougoslavie')#
-#pays.sub <- c('Allemagne', 'France', 'Italie', 'Portugal', 'Espagne', 'Ex-Yougoslavie')#
-pays.sub <- c('Allemagne','Italie', 'Portugal', 'Espagne', 'Ex-Yougoslavie', 'France', "Autriche",  "Turquie", 'Autre pays européen')#
-#
-pays.sub <- structure(1:length(pays.sub), names = c(pays.sub))#
-facetGroup <- structure(c(1:5, rep(6, 4)), names = names(pays.sub)[c(1:5, rep(9, 4))])#
-# # recompute 'autre pays européen'#
-# data.sub[data.sub[,1] == 'Autre pays européen','value'] <- as.vector(by(data.sub, data.sub$variable, function(dd) {#
-# 	dd[dd[,1] == 'Europe','value'] - sum(dd[dd[,1] %in% names(pays.sub)[-length(pays.sub)],'value'], na.rm = T)#
-# }))#
-#
-data.sub <- data.sub[which(data.sub[,1] %in% names(pays.sub)),]#
-data.sub[,1] <- factor(data.sub[,1], levels = names(pays.sub))#
-data.sub$facetGroup <- factor(names(facetGroup)[match(data.sub[,1], names(pays.sub))], levels = unique(names(facetGroup)))#
-#
-#ggplot(data.sub, aes(variable, value)) + geom_line() + facet_wrap ( ~ Nationalité, nrow = 2) + ggtheme_ygrid#
-ggplot(data.sub, aes(variable, value)) + geom_area(aes(fill = Nationalité), position = 'stack') + ggtheme_ygrid +#
-	xlab("Année") + ylab("Population") + facet_wrap ( ~ facetGroup, nrow = 3) + scale_fill_manual(values = swi_9palette) +#
-	ggtitle("Population d'Europe résidant en Suisse de 1850-2009") + paneltheme#
-#
-ggplot(data.sub, aes(variable / 100, value)) + geom_area(aes(fill = Nationalité), position = 'stack') + ggtheme_ygrid +#
-	facet_wrap ( ~ facetGroup, nrow = 3) + scale_fill_manual(values = swi_9palette) + scale_x_continuous("Année", labels=function(x) x*100) +#
-	ggtitle("Population d'Europe résidant en Suisse de 1850-2009") + paneltheme + scale_y_continuous("Population", labels=function(x) x/1000)#
-dev.off()#
-## ANNOTATIONS#
-# 1. Au début du XXème siècle, Les ressortissants des divers états allemands forment le pourcentage le plus élevé. Il s’agit essentiellement d’ouvriers artisans qui constituent, dans quelques villes, une proportion importante de tailleurs, de cordonniers et de charpentiers. Les Italiens s’imposent de plus en plus, une grande partie d’entre eux s’engage comme terrassiers et manœuvres dans la construction des chemins de fer et des premières usines hydro-électriques#
-# 2.
+data.file <- 'eurostat_foreignerPopulation_merged.csv'#
+data.read <- read.csv(data.file)
+data.read
 setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger')
-ggplot(data.sub, aes(variable / 100, value)) + geom_area(aes(fill = Nationalité), position = 'stack') + ggtheme_ygrid +#
-	facet_wrap ( ~ facetGroup, nrow = 3) + scale_fill_manual(values = swi_9palette) + scale_x_continuous("Année", labels=function(x) x*100) +#
-	ggtitle("Population d'Europe résidant en Suisse de 1850-2009") + paneltheme + scale_y_continuous("Population", labels=function(x) x/1000)
-setwd('/Users/nguyendu/Google Drive/swissinfo/_helpers')
-paneltheme <- {#
-	theme(strip.background = element_rect(colour = "black", fill = "white", size = 1),#
-		strip.text = element_text(colour = "black", hjust = 0.1, family = font))#
-}
-ggplot(data.sub, aes(variable / 100, value)) + geom_area(aes(fill = Nationalité), position = 'stack') + ggtheme_ygrid +#
-	facet_wrap ( ~ facetGroup, nrow = 3) + scale_fill_manual(values = swi_9palette) + scale_x_continuous("Année", labels=function(x) x*100) +#
-	ggtitle("Population d'Europe résidant en Suisse de 1850-2009") + paneltheme + scale_y_continuous("Population", labels=function(x) x/1000)
-setwd('/Users/nguyendu/Google Drive/swissinfo/_helpers')
-paneltheme <- {#
-	theme(strip.background = element_rect(colour = "black", fill = "white", size = 0.5),#
-		strip.text = element_text(colour = "black", hjust = 0.1, family = font))#
-}
-ggplot(data.sub, aes(variable / 100, value)) + geom_area(aes(fill = Nationalité), position = 'stack') + ggtheme_ygrid +#
-	facet_wrap ( ~ facetGroup, nrow = 3) + scale_fill_manual(values = swi_9palette) + scale_x_continuous("Année", labels=function(x) x*100) +#
-	ggtitle("Population d'Europe résidant en Suisse de 1850-2009") + paneltheme + scale_y_continuous("Population", labels=function(x) x/1000)
-setwd('/Users/nguyendu/Google Drive/swissinfo/_helpers')
-paneltheme <- {#
-	theme(strip.background = element_rect(colour = "black", fill = "white", size = 0.1),#
-		strip.text = element_text(colour = "black", hjust = 0.1, family = font))#
-}
-ggplot(data.sub, aes(variable / 100, value)) + geom_area(aes(fill = Nationalité), position = 'stack') + ggtheme_ygrid +#
-	facet_wrap ( ~ facetGroup, nrow = 3) + scale_fill_manual(values = swi_9palette) + scale_x_continuous("Année", labels=function(x) x*100) +#
-	ggtitle("Population d'Europe résidant en Suisse de 1850-2009") + paneltheme + scale_y_continuous("Population", labels=function(x) x/1000)
-setwd('/Users/nguyendu/Google Drive/swissinfo/_helpers')
-paneltheme <- {#
-	theme(strip.background = element_rect(colour = "white", fill = "white", size = 0.1),#
-		strip.text = element_text(colour = "black", hjust = 0.1, family = font))#
-}
-ggplot(data.sub, aes(variable / 100, value)) + geom_area(aes(fill = Nationalité), position = 'stack') + ggtheme_ygrid +#
-	facet_wrap ( ~ facetGroup, nrow = 3) + scale_fill_manual(values = swi_9palette) + scale_x_continuous("Année", labels=function(x) x*100) +#
-	ggtitle("Population d'Europe résidant en Suisse de 1850-2009") + paneltheme + scale_y_continuous("Population", labels=function(x) x/1000)
+countrycode(data.read[,1], origin = "ioc", destination = "iso2c")
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger')
+countrycode(data.read[,1], origin = "wb", destination = "iso2c")
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger')
+countrycode(data.read[,1], origin = "country.name", destination = "iso2c")
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger')
+data.read$iso2 <- countrycode(data.read[,1], origin = "country.name", destination = "iso2c")
+data.read$iso2
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger')
+write.table(data.read, file="eurostat_percForeigners.csv", sep=",", row.names = F)
 setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger')
 #############################################################################################
 ###		SETTINGS#
 #############################################################################################
 #
 source("~/swissinfo/_helpers/helpers.R")#
-#
-widthFig <- 10#
-heightFig <- widthFig * 1.2#
+font <- "Open Sans"#
 #
 #############################################################################################
 ###		Plot world map % immigrant foreign born#
 #############################################################################################
 #
-data.file <- 'hs-f-01.01.01.03.csv'#
+data.file <- 'UN_MigrantStock_country2013.csv'#
 data.read <- read.csv(data.file)#
+data.read$iso2 <- countrycode(data.read[,2], origin = "iso3n", destination = "iso2c")#
+data.read$continent <- countrycode(data.read[,'iso2'], origin = "iso2c", destination = "continent")#
+# for countries with no match, match the name#
+#idx <- which(is.na(data.read$iso2))#
+#data.read[idx,'iso2']<- countrycode(data.read[idx,1], origin = "country.name", destination = "iso2c")#
 #
-## Reformat#
-# get rid of the ...#
-for(i in 2:ncol(data.read)) {#
-	data.read[,i] <- as.numeric(as.character(data.read[,i]))#
-}#
-# replace NA with 0#
-data.read[is.na(data.read)] <- 0#
+# Remove Holy See#
+data.read <- data.read[which(!data.read$iso2 %in% c('VA', 'AD','MC', 'IM', 'GI')),]#
 #
-#rename country#
-data.read[,1] <- gsub(" \\d\\)", "", data.read[,1])#
-# rename columns/year#
-colnames(data.read) <- gsub("^X", "", colnames(data.read))#
-# cluster ex-yougoslavia countries#
-yougo <- c('Yougoslavie', 'Serbie-et-Monténégro', 'Serbie', 'Monténégro', 'Kosovo', 'Croatie', 'Bosnie et Herzégovine','Macédoine')#
-idx <- match(yougo, data.read[,1])#
-stopifnot(all(idx))#
-#
-data <- data.read[-idx,]#
-tmp <- cbind(Nationalité = "Ex-Yougoslavie", as.data.frame(lapply(data.read[idx,2:ncol(data.read)], function(col) sum(col, na.rm = T))))#
-colnames(tmp) <- colnames(data)#
-#
-data <- rbind(data, tmp)#
-#
-pdf("Figures.pdf", width = widthFig, height = heightFig, family = font)#
-#############################################################################################
-###		Population Suisse, Européenne, et non-européenne#
-#############################################################################################
-#
-data.sub <- data#
-data.sub <- data.sub[data.sub[,1] %in% c('Suisse', 'Europe'),]#
-data.sub <- melt(rbind(data.sub, cbind(Nationalité="Non-Européan", data[data[,1] == 'Etranger',-1] - data[data[,1] == 'Europe',-1])))#
-data.sub$variable <- as.numeric(as.character(data.sub$variable))#
-#
-#ggplot(data.sub) + geom_line(aes(variable, value, group = Nationalité, color = Nationalité))#
-g1 <- ggplot(data.sub, aes(variable, value, fill = Nationalité)) + geom_area(position = 'stack') + ggtheme +#
-	xlab("Année") + ylab("Population") + scale_fill_manual(values = swi_9palette[c(2,8,4)]) +#
-	ggtitle("La population résidente en Suisse de 1850-2009") + theme(legend.position = "top")#
-#
-g1#
-g1 + geom_vline(xintercept = 1880, color = "lightgrey")#
-## ANNOTATION#
-# 1. Au XIXe siècle, des millions d'Européens, des centaines de milliers de Suisses ont quitté le Vieux-Continent pour chercher un monde nouveau.#
-# La précarité des conditions de vie et l’insuffisance de la production agricole#
-# 2. C'est seulement vers 1880 que l’immigration d’étrangers vers la Suisse, provenant surtout des pays limitrophes, dépasse l’émigration hors de Suisse#
-# Au début du 20e siècle, 97% des étrangers proviennent des pays voisins (Allemagne, France, Italie, Autriche).#
-# 3. En Suisse où la politique d'immigration et la question des étrangers est régulièrement débattue, il est bon de mentionner qu'en 2012, 85% de la population résidante permanente étrangère en Suisse provient d'un pays européen. 2/3 de l'UE/AELE.#
-#
-#############################################################################################
-###		Population pays d'Europe et continents#
-#############################################################################################
-#
-data.sub <- melt(data)#
-data.sub$variable <- as.numeric(as.character(data.sub$variable))#
-#
-##
-by(data.sub, data.sub$variable, function(dd) (dd[dd$Nationalité == "Allemagne", 'value'] /  dd[dd$Nationalité == "Total ", 'value']) * 100)#
-#pays.sub <- c('Afrique', 'Asie', 'Amérique', 'Allemagne', 'France', 'Italie', 'Portugal', 'Espagne', 'Ex-Yougoslavie')#
-#pays.sub <- c('Allemagne', 'France', 'Italie', 'Portugal', 'Espagne', 'Ex-Yougoslavie')#
-pays.sub <- c('Allemagne','Italie', 'Portugal', 'Espagne', 'Ex-Yougoslavie', 'France', "Autriche",  "Turquie", 'Autre pays européen')#
-#
-pays.sub <- structure(1:length(pays.sub), names = c(pays.sub))#
-facetGroup <- structure(c(1:5, rep(6, 4)), names = names(pays.sub)[c(1:5, rep(9, 4))])#
-# # recompute 'autre pays européen'#
-# data.sub[data.sub[,1] == 'Autre pays européen','value'] <- as.vector(by(data.sub, data.sub$variable, function(dd) {#
-# 	dd[dd[,1] == 'Europe','value'] - sum(dd[dd[,1] %in% names(pays.sub)[-length(pays.sub)],'value'], na.rm = T)#
-# }))#
-#
-data.sub <- data.sub[which(data.sub[,1] %in% names(pays.sub)),]#
-data.sub[,1] <- factor(data.sub[,1], levels = names(pays.sub))#
-data.sub$facetGroup <- factor(names(facetGroup)[match(data.sub[,1], names(pays.sub))], levels = unique(names(facetGroup)))#
-#
-#ggplot(data.sub, aes(variable, value)) + geom_line() + facet_wrap ( ~ Nationalité, nrow = 2) + ggtheme_ygrid#
-ggplot(data.sub, aes(variable, value)) + geom_area(aes(fill = Nationalité), position = 'stack') + ggtheme_ygrid +#
-	xlab("Année") + ylab("Population") + facet_wrap ( ~ facetGroup, nrow = 3) + scale_fill_manual(values = swi_9palette) +#
-	ggtitle("Population d'Europe résidant en Suisse de 1850-2009") + paneltheme#
-#
-ggplot(data.sub, aes(variable / 100, value)) + geom_area(aes(fill = Nationalité), position = 'stack') + ggtheme_ygrid +#
-	facet_wrap ( ~ facetGroup, nrow = 3) + scale_fill_manual(values = swi_9palette) + scale_x_continuous("Année", labels=function(x) x*100) +#
-	ggtitle("Population d'Europe résidant en Suisse de 1850-2009") + paneltheme + scale_y_continuous("Population", labels=function(x) x/1000)#
-dev.off()#
-## ANNOTATIONS#
-# 1. Au début du XXème siècle, Les ressortissants des divers états allemands forment le pourcentage le plus élevé. Il s’agit essentiellement d’ouvriers artisans qui constituent, dans quelques villes, une proportion importante de tailleurs, de cordonniers et de charpentiers. Les Italiens s’imposent de plus en plus, une grande partie d’entre eux s’engage comme terrassiers et manœuvres dans la construction des chemins de fer et des premières usines hydro-électriques#
-# 2.
+write.table(data.read, file="UN_MigrantStock_country2013_iso2.csv", sep=",", row.names = F)#
+write.table(data.read[which(data.read$continent == 'Europe'),], file="UN_MigrantStock_europe2013_iso2.csv", sep=",", row.names = F)

@@ -1,0 +1,710 @@
+require( rCharts )#
+options(RCHART_TEMPLATE = 'Rickshaw.html')#
+#specify the data#
+data = data.frame(#
+c( 0, 1, 2, 3 ),#
+c( 40, 49, 17, 42 ),#
+stringsAsFactors = FALSE#
+)#
+colnames(data) <- c("x","y")#
+#build the plot#
+r1 <- Rickshaw$new()#
+r1$layer(#
+y ~ x,#
+data = data,#
+type = "area",#
+colors= "steelblue",#
+height = 240,#
+width = 540#
+)#
+#turn off all the nice built in features#
+#to match the sparse first example#
+r1$set(#
+hoverDetail = FALSE,#
+xAxis = FALSE,#
+yAxis = FALSE,#
+shelving = FALSE,#
+legend = FALSE,#
+slider = FALSE,#
+highlight = FALSE#
+)
+data <- read.csv("data/data2.csv", stringsAsFactors = FALSE)#
+#build the plot#
+r2 <- Rickshaw$new()#
+r2$layer(#
+y ~ x,#
+data = data,#
+type = "area",#
+colors= "steelblue",#
+height = 240,#
+width = 540#
+)#
+#turn off all the nice built in features#
+#to match the sparse second example#
+r2$set(#
+hoverDetail = FALSE,#
+xAxis = FALSE,#
+yAxis = FALSE,#
+shelving = FALSE,#
+legend = FALSE,#
+slider = FALSE,#
+highlight = FALSE#
+)
+p1 <- nPlot(mpg ~ wt, group = 'cyl', data = mtcars, type = 'scatterChart')#
+p1$xAxis(axisLabel = 'Weight')#
+p1
+## {title: MultiBar Chart}#
+hair_eye = as.data.frame(HairEyeColor)#
+p2 <- nPlot(Freq ~ Hair, group = 'Eye', data = subset(hair_eye, Sex == "Female"), type = 'multiBarChart')#
+p2$chart(color = c('brown', 'blue', '#594c26', 'green'))#
+p2#
+## {title: MultiBar Horizontal Chart}#
+p3 <- nPlot(~ cyl, group = 'gear', data = mtcars, type = 'multiBarHorizontalChart')#
+p3$chart(showControls = F)#
+p3#
+## {title: Pie Chart}#
+p4 <- nPlot(~ cyl, data = mtcars, type = 'pieChart')#
+p4#
+## {title: Donut Chart}#
+p5 <- nPlot(~ cyl, data = mtcars, type = 'pieChart')#
+p5$chart(donut = TRUE)#
+p5#
+## {title: Line Chart}#
+data(economics, package = 'ggplot2')#
+p6 <- nPlot(uempmed ~ date, data = economics, type = 'lineChart')#
+p6#
+## {title: Line with Focus Chart }#
+ecm <- reshape2::melt(economics[,c('date', 'uempmed', 'psavert')], id = 'date')#
+p7 <- nPlot(value ~ date, group = 'variable', data = ecm, type = 'lineWithFocusChart')#
+#test format dates on the xAxis#
+#also good test of javascript functions as parameters#
+#dates from R to JSON will come over as number of days since 1970-01-01#
+#so convert to milliseconds 86400000 in a day and then format with d3#
+#on lineWithFocusChart type xAxis will also set x2Axis unless it is specified#
+p7$xAxis( tickFormat="#!function(d) {return d3.time.format('%b %Y')(new Date( d * 86400000 ));}!#" )#
+#test xAxis also sets x2Axis#
+p7#
+#now test setting x2Axis to something different#
+#test format dates on the x2Axis#
+#test to show %Y format which is different than xAxis#
+p7$x2Axis( tickFormat="#!function(d) {return d3.time.format('%Y')(new Date( d * 86400000 ));}!#" )#
+p7#
+#test set xAxis again to make sure it does not override set x2Axis#
+p7$xAxis( NULL, replace = T)#
+p7
+require( rCharts )
+?options
+require( rCharts )#
+options(RCHART_TEMPLATE = 'Rickshaw.html')#
+#specify the data#
+data = data.frame(#
+  c( 0, 1, 2, 3 ),#
+  c( 40, 49, 17, 42 ),#
+  stringsAsFactors = FALSE#
+)#
+colnames(data) <- c("x","y")#
+#build the plot#
+r1 <- Rickshaw$new()#
+r1$layer(#
+  y ~ x,#
+  data = data,#
+  type = "area",#
+  colors= "steelblue",#
+  height = 240,#
+  width = 540#
+)#
+#turn off all the nice built in features#
+#to match the sparse first example#
+r1$set(#
+  hoverDetail = FALSE,#
+  xAxis = FALSE,#
+  yAxis = FALSE,#
+  shelving = FALSE,#
+  legend = FALSE,#
+  slider = FALSE,#
+  highlight = FALSE#
+)#
+#r1
+r1
+# Example 2#
+require(rCharts)#
+# options(RCHART_TEMPLATE = 'Rickshaw.html')#
+require(RColorBrewer)#
+data(economics, package = 'ggplot2')#
+datm = reshape2::melt(#
+  economics[,c('date', 'psavert', 'uempmed')],#
+  id = 'date'#
+)#
+datm <- transform(datm, date = to_jsdate(date))#
+p2 <- Rickshaw$new()#
+p2$layer(value ~ date, group = 'variable', data = datm, type = 'line', #
+  colors = c("darkred", "darkslategrey"))
+p2
+to_jsdate <- function(date_){#
+  val = as.POSIXct(as.Date(date_),origin="1970-01-01")#
+  as.numeric(val)#
+}#
+p3 <- Rickshaw$new()#
+p3$layer(Employed ~ Year, data = longley, type = 'line', colors = c('darkred'))#
+#
+usp = reshape2::melt(USPersonalExpenditure)#
+p4 <- Rickshaw$new()#
+p4$layer(value ~ Var2, group = 'Var1', data = usp, type = 'area')#
+p4$show(T)#
+#
+dat <- yaml::yaml.load('[ { x: 0, y: 40 }, { x: 1, y: 49 }, { x: 2, y: 17 }, { x: 3, y: 42 } ]')#
+#
+dat <- data.frame(#
+  x = c(0, 1, 2, 3),#
+  y = c(40, 49, 2, 17)#
+)
+# Example 1#
+p1 <- Rickshaw$new()#
+p1$layer(~ cyl, group = 'am', data = mtcars, type = 'bar')#
+#
+# Example 2#
+require(rCharts)#
+# options(RCHART_TEMPLATE = 'Rickshaw.html')#
+require(RColorBrewer)#
+data(economics, package = 'ggplot2')#
+datm = reshape2::melt(#
+  economics[,c('date', 'psavert', 'uempmed')],#
+  id = 'date'#
+)#
+datm <- transform(datm, date = to_jsdate(date))#
+p2 <- Rickshaw$new()#
+p2$layer(value ~ date, group = 'variable', data = datm, type = 'line', #
+  colors = c("darkred", "darkslategrey"))
+p2
+to_jsdate <- function(date_){#
+  val = as.POSIXct(as.Date(date_),origin="1970-01-01")#
+  as.numeric(val)#
+}#
+p3 <- Rickshaw$new()#
+p3$layer(Employed ~ Year, data = longley, type = 'line', colors = c('darkred'))#
+#
+usp = reshape2::melt(USPersonalExpenditure)#
+p4 <- Rickshaw$new()#
+p4$layer(value ~ Var2, group = 'Var1', data = usp, type = 'area')#
+p4$show(T)
+library(pXr)
+library(pXR)
+library(pxR)
+library(pxr)
+library(pXR)
+library(pXr)
+library(pxR)
+library(ggplot2)
+install.packages(pxR)
+install.packages("pxR")
+library(pxR)
+px<- read.px("~/Downloads/ilc_di01.px")
+px
+px<- read.px("~/Downloads/ilc_di01.px")
+?read.px
+px<- read.px("~/Downloads/ilc_di01.px")
+source('https://raw.githubusercontent.com/walkerke/teaching-with-datavis/master/pyramids/rcharts_pyramids.R')
+## Script to generate population pyramids from the Census Bureau's International Database with rCharts ###
+#
+library(XML)#
+library(reshape2)#
+library(rCharts)#
+library(plyr)#
+getAgeTable <- function(country, year) {#
+  c1 <- "http://www.census.gov/population/international/data/idb/region.php?N=%20Results%20&T=10&A=separate&RT=0&Y="  #
+  c2 <- "&R=-1&C="#
+  yrs <- gsub(" ", "", toString(year))#
+  url <- paste0(c1, yrs, c2, country)#
+  df <- data.frame(readHTMLTable(url))#
+  nms <- c("Year", "Age", "total", "Male", "Female", "percent", "pctMale", "pctFemale", "sexratio")  #
+  names(df) <- nms  #
+  cols <- c(1, 3:9)#
+  df[,cols] <- apply(df[,cols], 2, function(x) as.numeric(as.character(gsub(",", "", x))))#
+  df <- df[df$Age != 'Total', ]  #
+  ord <- 1:nrow(df)#
+  df <- cbind(df, ord)#
+  return(df)#
+}
+dPyramid <- function(country, year, colors=NULL) {#
+  dat <- getAgeTable(country, year)#
+  dat$Male <- -1 * dat$Male#
+  keep <- c("Year", "Age", "Male", "Female", "ord")#
+  dat.sub <- dat[,keep]#
+  dat.melt <- melt(dat.sub, #
+                   value.name='Population', #
+                   variable.name = 'Gender', #
+                   id.vars=c('Age', 'ord', 'Year') )#
+  dat.melt$gencode <- ifelse(dat.melt$Gender == 'Male', 1, 2)#
+  d1 <- dPlot(#
+    x = "Population", #
+    y = "Age", #
+    groups = "Gender", #
+    data = dat.melt, #
+    type = 'bar')#
+  d1$yAxis(type = "addCategoryAxis", orderRule = "ord")#
+  d1$xAxis(type = "addMeasureAxis")#
+  d1$legend( x = 60, y = 10, width = 700, height = 20, horizontalAlign = "right")#
+  if (!is.null(colors)){#
+    d1$colorAxis(#
+      type = "addColorAxis", #
+      colorSeries = "gencode", #
+      palette = colors#
+    )#
+  }#
+  if (length(year) > 1) {#
+    d1$set(storyboard = "Year")#
+    max_x <- round_any(max(dat.melt$Population), 10000, f = ceiling)#
+    min_x <- round_any(min(dat.melt$Population), 10000, f = floor)#
+    d1$xAxis(overrideMax = max_x, overrideMin = min_x)#
+  }#
+  if (max(dat.melt$Population >= 1000000)) {#
+    d1$setTemplate( afterScript = #
+                      "#
+                  <script>#
+                    x._getFormat = function () {#
+                    return function(d) {#
+                    return d3.format(',.1f')(Math.abs(d) / 1000000) + 'm';#
+                     };#
+                    };#
+                  myChart.draw()#
+                  </script>#
+                  ")#
+  } else {#
+    d1$setTemplate( afterScript = #
+                      "#
+                  <script>#
+                    x._getFormat = function () {#
+                    return function(d) {#
+                    return d3.format(',.0f')(Math.abs(d) / 1000) + 'k';#
+                     };#
+                    };#
+                  myChart.draw()#
+                  </script>#
+                  ")#
+  }#
+#
+  d1#
+}
+d1
+dPyramid
+dPyramid('GM', seq(2000, 2050, 10), colors = c('black', 'red'))
+# Initialize libraries required#
+library(rCharts)#
+library(reshape2)#
+meansconferences=read.csv("https://raw.github.com/patilv/ESPNBball/master/meansconferences.csv")#
+# Mean statistics for all WCC and Big 12 teams for seasons 2001-2002 through 2012-2013  #
+# mean Points.Per.Game, mean Games.Played, mean Minutes,mean Rebounds.Per.Game, mean Assists.Per.Game, mean Steals.Per.Game,mean Blocks.Per.Game,#
+# mean Turnovers.Per.Game, mean Field.Goal.Percent, mean Free.Throw.Percent, mean Three.Point.FieldGoal.Percent#
+# For more info on how this dataset was generated, #
+# please see blog post at http://analyticsandvisualization.blogspot.com/2013/08/short-tales-of-two-ncaa-basketball.html#
+meltmeansconferences=melt(meansconferences[-c(1,10:14)], id.vars=c("Conference","Year")) # Remove the first irrelevant index column and few additional ones to keep this clean#
+# Horizontal Stacked bars chart 100% Storyboard#
+d1=dPlot(y="Year", x="value",data=meltmeansconferences, groups="variable",type="bar") # looking at the entire data instead of subset#
+d1$yAxis(type="addCategoryAxis", orderRule="Year")#
+d1$xAxis(type="addPctAxis") # instead of addMeasureAxis used in the Horizontal Stacked Bar#
+d1$set(storyboard = "Conference") # chart changes by conference#
+d1$legend(#
+  x = 0,#
+  y = 0,#
+  width = 500,#
+  height = 75,#
+  horizontalAlign = "right"#
+)
+# Initialize libraries required#
+library(rCharts)#
+library(reshape2)#
+meansconferences=read.csv("https://raw.github.com/patilv/ESPNBball/master/meansconferences.csv")
+library(rCharts)#
+library(reshape2)#
+meansconferences=read.csv("https://raw.github.com/patilv/ESPNBball/master/meansconferences.csv")
+require(XML)
+xmlParse("~/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger/ink/area_swissVsForeigners copy.svg")
+xml<- xmlParse("~/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger/ink/area_swissVsForeigners copy.svg")
+str(xml)
+xml
+?saveXML
+xmlAttrs(xml)
+xml
+xmlSize(r)
+xmlSize(xml)
+xmlName(xml)
+xml[[1]]
+str(xml)
+xm<- xmlParse("~/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger/ink/area_swissVsForeigners copy.svg")
+str(xm)
+xm
+xmlRoot(xml)
+xmlRoot(xm)
+test<- xmlRoot(xm)
+str(test)
+xmlAttrs(test)
+xmlName(test)
+test
+xmltop<- xmlRoot(xm)
+xmlName(xmltop)
+xmlSize(xmltop)
+xmlName(xmltop[[1]])
+xmlName(xmltop[[2]])
+xmlName(xmltop[[3]])
+xmlName(xmltop[[4]])
+xmlName(xmltop[[5]])
+xmlInternalTreeParse(xm)
+xmlInternalTreeParse("~/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger/ink/area_swissVsForeigners copy.svg")
+xm<- xmlInternalTreeParse("~/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Etranger/ink/area_swissVsForeigners copy.svg")
+str(xm)
+?xpathApply
+install.packages("showtext")
+ls()
+sadf
+sadfsadf
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/prod/vieillissement')
+#############################################################################################
+###		SETTINGS#
+#############################################################################################
+#
+source("~/swissinfo/_helpers/helpers.R")#
+library(animation)#
+#
+displayStatistics <- F#
+data.file <- 'contenate_allData.csv'#
+#
+text.file <- 'trad_ar.csv'#
+#
+#############################################################################################
+###		HELPERS#
+#############################################################################################
+#
+ggthemeNoFont <- {#
+    #based theme_bw eliminates baground, gridlines, and chart border#
+  theme_bw() + theme(plot.background = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(),#
+   panel.border = element_blank(), panel.background = element_blank(), axis.ticks = element_line(size = 0.2),#
+   plot.title = element_text(hjust = 0),panel.grid.major = element_line(colour = "#efe9e0")#
+ )#
+}#
+#############################################################################################
+###		Load translation data#
+#############################################################################################
+#
+text <- read.csv(text.file, stringsAsFactors = F)
+text
+text[1,1]
+text[1,2]
+text[2,1]
+rev(test)
+rev(text)
+?rev
+text[2,1]
+rev(text[2,1])
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/prod/vieillissement')
+text <- read.csv(text.file, stringsAsFactors = F)#
+strReverse <- function(x) sapply(lapply(strsplit(x, NULL), rev), paste, collapse="")
+strReverse(text)
+strReverse(text[1,1])
+strReverse(text[2,1])
+text
+nrow(text)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/prod/vieillissement')
+text <- read.csv(text.file, stringsAsFactors = F)#
+strReverse <- function(x) sapply(lapply(strsplit(x, NULL), rev), paste, collapse="")#
+## Reverse the text#
+#
+for (i in 1:nrow(text)) {#
+	text[i,1] <- strReverse(text[i,1])#
+}
+text
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/prod/vieillissement')
+data <- read.csv(data.file, stringsAsFactors = F)#
+colnames(data)[2:ncol(data)] <- gsub("^X", "", colnames(data)[2:ncol(data)])#
+#
+data <- data.frame(Age = data[,1], melt(data[,2:ncol(data)]))#
+colnames(data) <- c('Age', 'Annee', "value")#
+data$Annee <- as.numeric(as.character(data$Annee))#
+# keep age in datan for statistics computation#
+datan <- data#
+data$Age <- reorder(data$Age, as.numeric(gsub("\\+$", "", as.character(data$Age))))#
+datan$Age <- as.numeric(gsub("\\+$", "", as.character(datan$Age)))#
+#
+# compute for each year, the proportion of by age group#
+# library(plyr)#
+# prop <- plyr::ddply(data, .(Annee), summarize,#
+# 	Age = Age,#
+# 	value = value,#
+# 	prop = value / sum(value) * 100)#
+#
+prop <- do.call(rbind, by(data, data$Annee, function(d) {#
+	data.frame(Age = d$Age, Annee = d$Annee[1], value = d$value, prop = d$value / sum(d$value) * 100)#
+}))#
+rownames(prop) <- NULL#
+#
+xlabel <- rep('', nlevels(data$Age))#
+idx.x <- c(seq(min(as.numeric(data$Age)), max(as.numeric(data$Age)), 10), nlevels(data$Age))#
+xlabel[idx.x]<- levels(data$Age)[idx.x]#
+#
+# load logo#
+g <- rasterGrob(swi_logo, interpolate=TRUE)#
+#
+### Get some key numbers#
+if(displayStatistics) {#
+	sum(dplyr::filter(datan, Annee == 1860, Age > 65)$value) / sum(dplyr::filter(datan, Annee == 1860, Age >= 20, Age <= 64)$value)#
+	sum(dplyr::filter(datan, Annee == 1901, Age > 65)$value) / sum(dplyr::filter(datan, Annee == 1901, Age >= 20, Age <= 64)$value)#
+	sum(dplyr::filter(datan, Annee == 2012, Age > 65)$value) / sum(dplyr::filter(datan, Annee == 2012, Age >= 20, Age <= 64)$value)#
+}#
+#
+plotayear2 <- function(data, a, title = "", descr = "", xlab = 'Age', ylab = "%", family = font) {#
+#
+	dd <- prop[prop$Annee == a,]#
+	ghist <- ggplot(data = dd) + geom_bar(aes(Age, prop), size =0.01, stat = "identity",#
+		color = swi_9palette[4], fill = swi_9palette[5]) + ggthemeNoFont  + scale_x_discrete(xlab, xlabel) +#
+		scale_y_continuous(name = ylab, limits = c(0, max(prop$prop)), expand = c(0.005,0.005)) +#
+		# the year in big#
+		geom_text(data = data.frame(x = levels(prop$Age)[nlevels(prop$Age)-5], y = max(prop$prop)-0.67, label = as.character(a)),#
+		aes(label = label, x = x, y = y), family = family, alpha = 0.6, size = 60,  color = swi_9palette[9], hjust = 1) +#
+		# the title#
+		geom_text(data = data.frame(x = levels(prop$Age)[1],#
+		y = max(prop$prop)-0.05, label = title), aes(label = label, x = x, y = y), family = family, alpha = 1, size = 9, hjust = 0, vjust = 0,#
+		fontface ="bold") +#
+		# the description#
+		geom_text(data = data.frame(x = levels(prop$Age)[1],#
+		y = max(prop$prop)-0.157, label = descr), aes(label = label, x = x, y = y), family = family, alpha = 0.8, size = 6, hjust = 0,vjust =0) +#
+		# theme#
+		theme(axis.text = element_text(size = rel(1), lineheight = 0), plot.margin = unit(c(0.8,1,1.1,0), "lines"),#
+		axis.title =  element_text(size = rel(1.5)), text = element_text(family = family))#
+	ghista <- ghist + annotation_custom(grob = g, xmin = nlevels(prop$Age)-nlevels(prop$Age)/8, xmax = nlevels(prop$Age),#
+	ymin = -0.15, ymax = -0.22)#
+    gt <- ggplot_gtable(ggplot_build(ghista))#
+    gt$layout$clip[gt$layout$name=="panel"] <- "off"#
+	grid.newpage()#
+    grid.draw(gt)#
+}
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/prod/vieillissement')
+a <- unique(prop$Annee)[10]#
+plotayear2(data, a, text[1,1], text[2,1], text[3,1], text[4,1], text[5,1])
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/prod/vieillissement')
+a <- unique(prop$Annee)[10]#
+plotayear2(data, a, text[1,1], text[2,1], text[3,1], text[4,1], "")
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/prod/vieillissement')
+plotayear2(data, a, text[1,1], text[2,1], text[3,1], text[4,1], "Farah")
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/prod/vieillissement')
+plotayear2(data, a, text[1,1], text[2,1], text[3,1], text[4,1], "Farisi")
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/prod/vieillissement')
+plotayear2(data, a, text[1,1], text[2,1], text[3,1], text[4,1], "KufiStandardGK")
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/prod/vieillissement')
+plotayear2(data, a, text[1,1], text[2,1], text[3,1], text[4,1], "Mishafi")
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/prod/vieillissement')
+plotayear2(data, a, text[1,1], text[2,1], text[3,1], text[4,1], "Muna")
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/prod/vieillissement')
+plotayear2(data, a, text[1,1], text[2,1], text[3,1], text[4,1], "Nadeem")
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/prod/vieillissement')
+plotayear2(data, a, text[1,1], text[2,1], text[3,1], text[4,1], "Sana")
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/prod/vieillissement')
+plotayear2(data, a, text[1,1], text[2,1], text[3,1], text[4,1], "Tahoma")
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/prod/vieillissement')
+plotayear2(data, a, text[1,1], text[2,1], text[3,1], text[4,1], "Times")
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/prod/vieillissement')
+plotayear2(data, a, text[1,1], text[2,1], text[3,1], text[4,1], "Waseem")
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/prod/vieillissement')
+plotayear2(data, a, text[1,1], text[2,1], text[3,1], text[4,1], "Al Nile")
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/prod/vieillissement')
+plotayear2(data, a, text[1,1], text[2,1], text[3,1], text[4,1], "Al Tarikh")
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/prod/vieillissement')
+plotayear2(data, a, text[1,1], text[2,1], text[3,1], text[4,1], "Farah")
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/prod/vieillissement')
+plotayear2(data, a, text[1,1], text[2,1], text[3,1], text[4,1], "Farisi")
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/prod/vieillissement')
+plotayear2(data, a, text[1,1], text[2,1], text[3,1], text[4,1], "Mishafi")
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/prod/vieillissement')
+plotayear2(data, a, text[1,1], text[2,1], text[3,1], text[4,1], "")
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/prod/vieillissement')
+plotayear2(data, a, text[1,1], text[2,1], text[3,1], text[4,1], "Farah")
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/prod/vieillissement')
+plotayear2(data, a, text[1,1], text[2,1], text[3,1], text[4,1], "Farsi")
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/prod/vieillissement')
+plotayear2(data, a, text[1,1], text[2,1], text[3,1], text[4,1], "Farisi")
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/prod/vieillissement')
+plotayear2(data, a, text[1,1], text[2,1], text[3,1], text[4,1], "Arial")
+Sys.getlocale()
+text
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/prod/vieillissement')
+#############################################################################################
+###		SETTINGS#
+#############################################################################################
+#
+source("~/swissinfo/_helpers/helpers.R")#
+library(animation)#
+#
+displayStatistics <- F#
+data.file <- 'contenate_allData.csv'#
+#
+text.file <- 'trad_ar.csv'#
+#
+#############################################################################################
+###		HELPERS#
+#############################################################################################
+#
+ggthemeNoFont <- {#
+    #based theme_bw eliminates baground, gridlines, and chart border#
+  theme_bw() + theme(plot.background = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(),#
+   panel.border = element_blank(), panel.background = element_blank(), axis.ticks = element_line(size = 0.2),#
+   plot.title = element_text(hjust = 0),panel.grid.major = element_line(colour = "#efe9e0")#
+ )#
+}#
+#############################################################################################
+###		Load translation data#
+#############################################################################################
+#
+text <- read.csv(text.file, stringsAsFactors = F)#
+# strReverse <- function(x) sapply(lapply(strsplit(x, NULL), rev), paste, collapse="")#
+# ## Reverse the text#
+##
+# for (i in 1:nrow(text)) {#
+# 	text[i,1] <- strReverse(text[i,1])#
+# }
+text
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/prod/vieillissement')
+#############################################################################################
+###		Load all data in one data.frame#
+#############################################################################################
+#
+data <- read.csv(data.file, stringsAsFactors = F)#
+colnames(data)[2:ncol(data)] <- gsub("^X", "", colnames(data)[2:ncol(data)])#
+#
+data <- data.frame(Age = data[,1], melt(data[,2:ncol(data)]))#
+colnames(data) <- c('Age', 'Annee', "value")#
+data$Annee <- as.numeric(as.character(data$Annee))#
+# keep age in datan for statistics computation#
+datan <- data#
+data$Age <- reorder(data$Age, as.numeric(gsub("\\+$", "", as.character(data$Age))))#
+datan$Age <- as.numeric(gsub("\\+$", "", as.character(datan$Age)))#
+#
+# compute for each year, the proportion of by age group#
+# library(plyr)#
+# prop <- plyr::ddply(data, .(Annee), summarize,#
+# 	Age = Age,#
+# 	value = value,#
+# 	prop = value / sum(value) * 100)#
+#
+prop <- do.call(rbind, by(data, data$Annee, function(d) {#
+	data.frame(Age = d$Age, Annee = d$Annee[1], value = d$value, prop = d$value / sum(d$value) * 100)#
+}))#
+rownames(prop) <- NULL#
+#
+xlabel <- rep('', nlevels(data$Age))#
+idx.x <- c(seq(min(as.numeric(data$Age)), max(as.numeric(data$Age)), 10), nlevels(data$Age))#
+xlabel[idx.x]<- levels(data$Age)[idx.x]#
+#
+# load logo#
+g <- rasterGrob(swi_logo, interpolate=TRUE)#
+#
+### Get some key numbers#
+if(displayStatistics) {#
+	sum(dplyr::filter(datan, Annee == 1860, Age > 65)$value) / sum(dplyr::filter(datan, Annee == 1860, Age >= 20, Age <= 64)$value)#
+	sum(dplyr::filter(datan, Annee == 1901, Age > 65)$value) / sum(dplyr::filter(datan, Annee == 1901, Age >= 20, Age <= 64)$value)#
+	sum(dplyr::filter(datan, Annee == 2012, Age > 65)$value) / sum(dplyr::filter(datan, Annee == 2012, Age >= 20, Age <= 64)$value)#
+}#
+#
+plotayear2 <- function(data, a, title = "", descr = "", xlab = 'Age', ylab = "%", family = font) {#
+#
+	dd <- prop[prop$Annee == a,]#
+	ghist <- ggplot(data = dd) + geom_bar(aes(Age, prop), size =0.01, stat = "identity",#
+		color = swi_9palette[4], fill = swi_9palette[5]) + ggthemeNoFont  + scale_x_discrete(xlab, xlabel) +#
+		scale_y_continuous(name = ylab, limits = c(0, max(prop$prop)), expand = c(0.005,0.005)) +#
+		# the year in big#
+		geom_text(data = data.frame(x = levels(prop$Age)[nlevels(prop$Age)-5], y = max(prop$prop)-0.67, label = as.character(a)),#
+		aes(label = label, x = x, y = y), family = family, alpha = 0.6, size = 60,  color = swi_9palette[9], hjust = 1) +#
+		# the title#
+		geom_text(data = data.frame(x = levels(prop$Age)[1],#
+		y = max(prop$prop)-0.05, label = title), aes(label = label, x = x, y = y), family = family, alpha = 1, size = 9, hjust = 0, vjust = 0,#
+		fontface ="bold") +#
+		# the description#
+		geom_text(data = data.frame(x = levels(prop$Age)[1],#
+		y = max(prop$prop)-0.157, label = descr), aes(label = label, x = x, y = y), family = family, alpha = 0.8, size = 6, hjust = 0,vjust =0) +#
+		# theme#
+		theme(axis.text = element_text(size = rel(1), lineheight = 0), plot.margin = unit(c(0.8,1,1.1,0), "lines"),#
+		axis.title =  element_text(size = rel(1.5)), text = element_text(family = family))#
+	ghista <- ghist + annotation_custom(grob = g, xmin = nlevels(prop$Age)-nlevels(prop$Age)/8, xmax = nlevels(prop$Age),#
+	ymin = -0.15, ymax = -0.22)#
+    gt <- ggplot_gtable(ggplot_build(ghista))#
+    gt$layout$clip[gt$layout$name=="panel"] <- "off"#
+	grid.newpage()#
+    grid.draw(gt)#
+}#
+#
+a <- unique(prop$Annee)[10]#
+plotayear2(data, a, text[1,1], text[2,1], text[3,1], text[4,1], "Arial")
+text
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/prod/vieillissement')
+plotayear2(data, a, "", "", "", "", "Arial")
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/prod/vieillissement')
+plotayear2(data, a, "", "", "", "", "Open Sans")
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/prod/vieillissement')
+# take only every 4 years#
+data.sub <- data[data$Annee %% 4 == 0,]#
+#
+for(i in 1:ncol(text)) {#
+#
+	fontToBeUsed <- "Open Sans"#
+	cat("\n", colnames(text)[i], "\t with font:", fontToBeUsed, "\n")#
+	saveGIF({#
+		for(a in c(unique(data.sub$Annee), 2012)) {#
+			plotayear2(data.sub, a, title = text[1,i], descr = text[2,i], xlab = text[3,i], ylab = text[4,i], family = fontToBeUsed)#
+		}#
+	}, movie.name = paste("populationAge_", colnames(text)[i], ".gif", sep =""), interval = 0.35, nmax = 50, ani.width = 640*1.1,#
+	ani.height = 640*1.1, loop = TRUE, outdir = getwd())#
+}
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/prod/vieillissement')
+# take only every 4 years#
+data.sub <- data[data$Annee %% 4 == 0,]#
+#
+for(i in 1:ncol(text)) {#
+#
+	fontToBeUsed <- "Open Sans"#
+	cat("\n", colnames(text)[i], "\t with font:", fontToBeUsed, "\n")#
+	saveGIF({#
+		for(a in c(unique(data.sub$Annee), 2012)) {#
+#			plotayear2(data.sub, a, title = text[1,i], descr = text[2,i], xlab = text[3,i], ylab = text[4,i], family = fontToBeUsed)#
+			plotayear2(data.sub, a, title = "", descr = "", xlab = "", ylab = "", family = fontToBeUsed)#
+		}#
+	}, movie.name = paste("populationAge_", colnames(text)[i], ".gif", sep =""), interval = 0.35, nmax = 50, ani.width = 640*1.1,#
+	ani.height = 640*1.1, loop = TRUE, outdir = getwd())#
+}
+getwd()
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/prod/vieillissement')
+# take only every 4 years#
+data.sub <- data[data$Annee %% 4 == 0,]#
+#
+for(i in 1:ncol(text)) {#
+#
+	fontToBeUsed <- "Open Sans"#
+	cat("\n", colnames(text)[i], "\t with font:", fontToBeUsed, "\n")#
+	saveGIF({#
+		for(a in c(unique(data.sub$Annee), 2012)) {#
+#			plotayear2(data.sub, a, title = text[1,i], descr = text[2,i], xlab = text[3,i], ylab = text[4,i], family = fontToBeUsed)#
+			plotayear2(data.sub, a, title = "", descr = "", xlab = "", ylab = "", family = fontToBeUsed)#
+		}#
+	}, movie.name = paste("populationAge_", colnames(text)[i], ".gif", sep =""), interval = 0.35, nmax = 50, ani.width = 640*1.1,#
+	ani.height = 640*1.1, loop = TRUE, outdir = getwd())#
+}
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/prod/vieillissement')
+# take only every 4 years#
+data.sub <- data[data$Annee %% 4 == 0,]#
+#
+for(i in 1:ncol(text)) {#
+#
+	fontToBeUsed <- "Open Sans"#
+	cat("\n", colnames(text)[i], "\t with font:", fontToBeUsed, "\n")#
+	saveGIF({#
+		for(a in c(unique(data.sub$Annee), 2012)) {#
+#			plotayear2(data.sub, a, title = text[1,i], descr = text[2,i], xlab = text[3,i], ylab = text[4,i], family = fontToBeUsed)#
+			plotayear2(data.sub, a, title = "", descr = "", xlab = "", ylab = "", family = fontToBeUsed)#
+		}#
+	}, movie.name = paste("populationAge_", colnames(text)[i], ".gif", sep =""), interval = 0.35, nmax = 50, ani.width = 640*1.1,#
+	ani.height = 640*1.1, loop = TRUE, outdir = getwd())#
+}
+text
+cat(text)
+cat(text[1,1])
+cat(text[2,1])
+plotayear2(data, a, "", "", "", "", "Open Sans")
+plotayear2(data, a, "", "", "", "", "Open Sans") + ggtitle(text[2,1])
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/prod/vieillissement')
+plotayear2(data, a, text[1,1], text[2,1], text[3,1], text[4,1], "Arial")

@@ -5,7 +5,7 @@
 source("~/swissinfo/_helpers/helpers.R")
 
 widthFig <- 10
-heightFig <- widthFig * 1.2
+heightFig <- widthFig
 
 ############################################################################################
 ###		Plot world map % immigrant foreign born
@@ -37,38 +37,51 @@ colnames(tmp) <- colnames(data)
 
 data <- rbind(data, tmp)
 
-pdf("Figures.pdf", width = widthFig, height = heightFig, family = font)
+pdf("Figures.pdf", width = widthFig, height = heightFig)
+
 ############################################################################################
 ###		Population Suisse, Européenne, et non-européenne
 ############################################################################################
 
 data.sub <- data
 data.sub <- data.sub[data.sub[,1] %in% c('Suisse', 'Europe'),]
-data.sub <- melt(rbind(data.sub, cbind(Nationalité="Non-Européan", data[data[,1] == 'Etranger',-1] - data[data[,1] == 'Europe',-1])))
+data.sub <- melt(rbind(data.sub, cbind(Nationalité="non-européenne", data[data[,1] == 'Etranger',-1] - data[data[,1] == 'Europe',-1])))
 data.sub$variable <- as.numeric(as.character(data.sub$variable))
 data.sub$facet <- 'area'
 data.sub$pc <- NA
 
-etranger.pc <- tapply(data.sub$value, data.sub$variable, function(tt) (sum(tt[2:3], na.rm =T) / sum(tt)) * 100)
+etranger.pc <- tapply(data.sub$value, data.sub$variable, function(tt) (sum(tt[2:3], na.rm =T) / sum(tt)))
 etranger.pc <- data.frame(Nationalité = NA, variable = as.numeric(rownames(etranger.pc)), value = NA, facet = "line", pc = as.vector(etranger.pc))
 data.sub2 <- rbind(data.sub, etranger.pc)
 
+
+plots <- list() # list of plots to lay them out in an single plot
 #ggplot(data.sub) + geom_line(aes(variable, value, group = Nationalité, color = Nationalité))
-g1 <- ggplot(data.sub, aes(variable, value, fill = Nationalité)) + geom_area(position = 'stack') + ggtheme +
-	xlab("Année") + ylab("Population") + scale_fill_manual(values = swi_9palette[c(2,8,4,5)]) +
-	ggtitle("La population résidente en Suisse de 1850-2009") + theme(legend.position = "top")
+g1 <- ggplot(data.sub2) + geom_area(aes(variable, value, fill = Nationalité), position = 'stack') + ggtheme +
+	scale_y_continuous(name = "", limits = c(0,8 * 10^6), expand = c(0.0,0.0), labels  = function(x) x / 10^6) +
+	scale_x_continuous(name = "", expand = c(0.0,0.0)) + theme(axis.ticks = element_line(size = 0.2)) +
+	xlab("") + ylab("") + scale_fill_manual(values = swi_22rpalette[c(10,2,1)]) +
+	ggtitle("Nationalité de population résidente en Suisse de 1850-2009") + theme(legend.position = "top")
 
 g1
 g1 + geom_vline(xintercept = 1880, color = "lightgrey")
 
 
 
-ggplot(data = data.sub2) + geom_area(aes(variable, value, fill = Nationalité), position = 'stack') + ggtheme +
-	xlab("Année") + ylab("Population") + scale_fill_manual(values = swi_9palette[c(2,8,4,5)]) +
+ggplot(data = data.sub2) + geom_area(aes(variable, value / 10^6, fill = Nationalité), position = 'stack') + ggtheme +
+	xlab("Année") + ylab("Population") + scale_fill_manual(values = swi_22rpalette[c(10,2,1)]) +
 	ggtitle("La population résidente en Suisse de 1850-2009") + theme(legend.position = "top") +
-	geom_line(aes(variable, pc)) + facet_wrap (~ facet, nrow = 2, scales = "free_y")
+	geom_line(aes(variable, pc)) + facet_wrap (~ facet, nrow = 2, scales = "free_y")+ theme(axis.ticks = element_line(size = 0.2))
 
 
+g2 <- ggplot(dplyr::filter(data.sub2, facet == "line")) + geom_line(aes(variable, pc), size =2, color = "#663333") + ggtheme_ygrid + scale_x_continuous(name = "", expand = c(0.0,0.0)) +
+scale_y_continuous(name = "", limits = c(0,0.25), expand = c(0.0,0.0), labels  = percent)
+
+
+plots[[1]] <- g1  # add each plot into plot list
+plots[[2]] <- g2
+layout <- matrix(c(1, 1, 1, 1, 2), ncol = 1, byrow = TRUE)
+multiplot(plotlist = plots, layout = layout)
 
 ## ANNOTATION
 # 1. Au XIXe siècle, des millions d'Européens, des centaines de milliers de Suisses ont quitté le Vieux-Continent pour chercher un monde nouveau.
@@ -103,18 +116,15 @@ data.sub <- data.sub[which(data.sub[,1] %in% names(pays.sub)),]
 data.sub[,1] <- factor(data.sub[,1], levels = names(pays.sub))
 data.sub$facetGroup <- factor(names(facetGroup)[match(data.sub[,1], names(pays.sub))], levels = unique(names(facetGroup)))
 
-#ggplot(data.sub, aes(variable, value)) + geom_line() + facet_wrap ( ~ Nationalité, nrow = 2) + ggtheme_ygrid
-ggplot(data.sub, aes(variable, value)) + geom_area(aes(fill = Nationalité), position = 'stack') + ggtheme_ygrid +
-	xlab("Année") + ylab("Population") + facet_wrap ( ~ facetGroup, nrow = 3) + scale_fill_manual(values = swi_9palette) +
-	ggtitle("Population d'Europe résidant en Suisse de 1850-2009") + paneltheme
-
 ggplot(data.sub, aes(variable / 100, value)) + geom_area(aes(fill = Nationalité), position = 'stack') + ggtheme_ygrid +
-	facet_wrap ( ~ facetGroup, nrow = 3) + scale_fill_manual(values = swi_9palette) + scale_x_continuous("Année", labels=function(x) x*100) +
-	ggtitle("Population d'Europe résidant en Suisse de 1850-2009") + paneltheme + scale_y_continuous("Population", labels=function(x) x/1000)
+	facet_wrap ( ~ facetGroup, nrow = 3) + scale_fill_manual(values = swi_9palette) + scale_x_continuous("", labels=function(x) x*100,  expand = c(0.0,0.0)) +
+	ggtitle("Nationalité des étrangers européens en Suisse 1850-2009") + paneltheme + scale_y_continuous("Population", labels=function(x) x/1000) +
+	paneltheme + theme(legend.position = "top")
 
 dev.off()
 ## ANNOTATIONS
 # 1. Au début du XXème siècle, Les ressortissants des divers états allemands forment le pourcentage le plus élevé. Il s’agit essentiellement d’ouvriers artisans qui constituent, dans quelques villes, une proportion importante de tailleurs, de cordonniers et de charpentiers. Les Italiens s’imposent de plus en plus, une grande partie d’entre eux s’engage comme terrassiers et manœuvres dans la construction des chemins de fer et des premières usines hydro-électriques
+# XXème siècle, les ressortissants allemands étaient essentiellement des artisans qui constituent, dans quelques villes, une proportion importante de tailleurs, de cordonniers et de charpentiers
 # 2.
 
 

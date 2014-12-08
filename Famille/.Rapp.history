@@ -1,0 +1,371 @@
+require( rCharts )#
+options(RCHART_TEMPLATE = 'Rickshaw.html')#
+#specify the data#
+data = data.frame(#
+c( 0, 1, 2, 3 ),#
+c( 40, 49, 17, 42 ),#
+stringsAsFactors = FALSE#
+)#
+colnames(data) <- c("x","y")#
+#build the plot#
+r1 <- Rickshaw$new()#
+r1$layer(#
+y ~ x,#
+data = data,#
+type = "area",#
+colors= "steelblue",#
+height = 240,#
+width = 540#
+)#
+#turn off all the nice built in features#
+#to match the sparse first example#
+r1$set(#
+hoverDetail = FALSE,#
+xAxis = FALSE,#
+yAxis = FALSE,#
+shelving = FALSE,#
+legend = FALSE,#
+slider = FALSE,#
+highlight = FALSE#
+)
+data <- read.csv("data/data2.csv", stringsAsFactors = FALSE)#
+#build the plot#
+r2 <- Rickshaw$new()#
+r2$layer(#
+y ~ x,#
+data = data,#
+type = "area",#
+colors= "steelblue",#
+height = 240,#
+width = 540#
+)#
+#turn off all the nice built in features#
+#to match the sparse second example#
+r2$set(#
+hoverDetail = FALSE,#
+xAxis = FALSE,#
+yAxis = FALSE,#
+shelving = FALSE,#
+legend = FALSE,#
+slider = FALSE,#
+highlight = FALSE#
+)
+p1 <- nPlot(mpg ~ wt, group = 'cyl', data = mtcars, type = 'scatterChart')#
+p1$xAxis(axisLabel = 'Weight')#
+p1
+## {title: MultiBar Chart}#
+hair_eye = as.data.frame(HairEyeColor)#
+p2 <- nPlot(Freq ~ Hair, group = 'Eye', data = subset(hair_eye, Sex == "Female"), type = 'multiBarChart')#
+p2$chart(color = c('brown', 'blue', '#594c26', 'green'))#
+p2#
+## {title: MultiBar Horizontal Chart}#
+p3 <- nPlot(~ cyl, group = 'gear', data = mtcars, type = 'multiBarHorizontalChart')#
+p3$chart(showControls = F)#
+p3#
+## {title: Pie Chart}#
+p4 <- nPlot(~ cyl, data = mtcars, type = 'pieChart')#
+p4#
+## {title: Donut Chart}#
+p5 <- nPlot(~ cyl, data = mtcars, type = 'pieChart')#
+p5$chart(donut = TRUE)#
+p5#
+## {title: Line Chart}#
+data(economics, package = 'ggplot2')#
+p6 <- nPlot(uempmed ~ date, data = economics, type = 'lineChart')#
+p6#
+## {title: Line with Focus Chart }#
+ecm <- reshape2::melt(economics[,c('date', 'uempmed', 'psavert')], id = 'date')#
+p7 <- nPlot(value ~ date, group = 'variable', data = ecm, type = 'lineWithFocusChart')#
+#test format dates on the xAxis#
+#also good test of javascript functions as parameters#
+#dates from R to JSON will come over as number of days since 1970-01-01#
+#so convert to milliseconds 86400000 in a day and then format with d3#
+#on lineWithFocusChart type xAxis will also set x2Axis unless it is specified#
+p7$xAxis( tickFormat="#!function(d) {return d3.time.format('%b %Y')(new Date( d * 86400000 ));}!#" )#
+#test xAxis also sets x2Axis#
+p7#
+#now test setting x2Axis to something different#
+#test format dates on the x2Axis#
+#test to show %Y format which is different than xAxis#
+p7$x2Axis( tickFormat="#!function(d) {return d3.time.format('%Y')(new Date( d * 86400000 ));}!#" )#
+p7#
+#test set xAxis again to make sure it does not override set x2Axis#
+p7$xAxis( NULL, replace = T)#
+p7
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+#############################################################################################
+###		SETTINGS#
+#############################################################################################
+#
+source("~/swissinfo/_helpers/helpers.R")#
+#
+data.file <- 'wbdata.Rdata'#
+#############################################################################################
+###  Get WB data#
+#############################################################################################
+#
+#### A) Using WB#
+indicators <- structure(c('SP.DYN.LE00.IN', 'SP.DYN.TFRT.IN'), names = c('lifeExpectancy', 'fertilityRate'))#
+#
+if(file.exists(data.file)) {#
+	load(data.file)#
+} else {#
+	library(WDI)#
+#
+	data.dl <- sapply(1:length(indicators), function(i) {#
+		wbdat <- WDI(indicator = indicators[i],#
+		  start = 1950,  end = 2014, extra = TRUE, cache = NULL)#
+		colnames(wbdat)[3] <- 'value'#
+		wbdat$indicator <- names(indicators)[i]#
+		wbdat#
+	}, simplify = FALSE)#
+	data.dl <- do.call(rbind, data.dl)#
+	data.dl$indicator <- factor(data.dl$indicator)#
+#
+	save(data.dl, file = data.file)#
+}#
+#############################################################################################
+### Plot life expectancy#
+#############################################################################################
+#
+swi_iso2 <- c("CH", "CN", "RU", "BR", "IN", "JP", "EU", "ZQ", "ZG", "XU", "Z4")#
+countries.iso2 <- c(swi_iso2, c('RW', 'SL', 'KH'))#
+#
+le <- data.dl[data.dl$indicator == names(indicators)[1],]#
+le <- le[order(le$year),]#
+#
+# filter out Israel#
+le <- le[le$iso2c != "IL",]#
+#
+# get the world average#
+le3 <- le[le$iso2c == "1W",]#
+# get only the countries, i.e. region is not "Aggregates" or NA#
+le <- le[!is.na(le$region) & (le$region != "Aggregates" | le$iso2c %in% countries.iso2) ,]#
+#
+# colors#
+le1 <- le[!le$iso2c %in% countries.iso2,]#
+le2 <- le[le$iso2c %in% countries.iso2,]#
+#
+# translate country names to french#
+tCountry <- le2$country#
+tCountry<- as.character(country_names[match(le2$iso2c, as.character(country_names[,1])), 9])#
+idx <- which(is.na(tCountry))#
+tCountry[idx ]<- le2$country[idx]#
+le2$country <- tCountry#
+#
+# relevel factors#
+ff <- dplyr::filter(le2, year == max(le2$year)-1)#
+le2$country <- factor(le2$country, levels = ff$country[order(ff$value)])#
+#
+#write.csv(rbind(le1, le2, le3), "lifeExpectancy.csv")#
+#
+plotMultiLineChart <- function(df1, df2, df3, yscale = "", title = "", xaxisPadding = 3) {#
+	gp <- ggplot() + geom_line(data = df1, aes(year, value, group = country), color = "darkgrey", alpha = 0.5, size = 0.2) + ggtheme +#
+	 	guides(colour = FALSE) + #selected countries#
+	 	geom_line(data = df2, aes(year, value, group = country, color = country), size = 0.5) +#
+	 	scale_colour_manual(values = swi_22rpalette) + geom_line(data = df3, aes(year, value, group = country),#
+	 	color = "black", size = 1.6, alpha = 0.6)#
+#
+	gp + scale_y_continuous(name = yscale, expand = c(0.01,0.01)) + ggtitle(title)+#
+	  scale_x_continuous(name = "", limits = c(min(le$year), max(le$year) + xaxisPadding), expand = c(0.0,0.0)) +#
+	  geom_dl(data = df2, aes(x = year + 0.1, y = value, label = country, color = country), list("last.points", cex = 0.75)) +#
+	  geom_dl(data = df3, aes(x = year + 0.1, y = value, label = country), list("last.points", cex = 0.75))#
+ }#
+#
+lep <- plotMultiLineChart(le1, le2, le3, title = "Espérance de vie")#
+lep#
+pdf("lifeExpectancy.pdf", width = 12, height = 12 * 1.3 )#
+lep#
+dev.off()#
+#
+### get the variation over time#
+wle <- le3[(!is.na(le3$value)),]#
+diff(wle[c(1, nrow(wle)), 'value']) / wle[1, 'value']#
+diff(wle[c(1, nrow(wle)), 'value'])#
+wle[c(1, nrow(wle)), 'year']#
+#############################################################################################
+### Plot fertility rate#
+#############################################################################################
+countries.iso2 <- c(swi_iso2, c('RW', 'YE', 'NE'))#
+#
+fr <- data.dl[data.dl$indicator == names(indicators)[2],]#
+fr <- fr[order(fr$year),]#
+#
+# filter out Hong-Kong and Macau#
+fr <- fr[!fr$iso2c %in% c('HK', 'MO'),]#
+#
+# get the world average#
+fr3 <- fr[fr$iso2c == "1W",]#
+# fr3 <- fr[fr$iso2c %in% c("1W", 'Z4', 'Z7', 'ZG', 'ZJ', 'ZQ'),]#
+# get only the countries, i.e. region is not "Aggregates" or NA#
+fr <- fr[!is.na(fr$region) & (fr$region != "Aggregates"  | fr$iso2c %in% countries.iso2),]#
+#
+# colors#
+fr1 <- fr[!fr$iso2c %in% countries.iso2,]#
+fr2 <- fr[fr$iso2c %in% countries.iso2,]#
+#
+# translate country names to french#
+tCountry <- fr2$country#
+tCountry<- as.character(country_names[match(fr2$iso2c, as.character(country_names[,1])), 9])#
+idx <- which(is.na(tCountry))#
+tCountry[idx ]<- fr2$country[idx]#
+fr2$country <- tCountry#
+# refactor factors#
+ff <- dplyr::filter(fr2, year == max(fr2$year)-1)#
+fr2$country <- factor(fr2$country, levels = ff$country[order(ff$value)])#
+#
+# get some of the max countries#
+dplyr::filter(fr1, value >= quantile(fr1$value, 0.99, na.rm =T) )#
+dplyr::filter(fr1, year == 2012)#
+# check fertility rate China#
+dplyr::filter(fr2, country == "Chine")#
+#
+frp <- plotMultiLineChart(fr1, fr2, fr3, title = "Taux de fécondité") + scale_y_continuous("", limits = c(1, 9.25), breaks = 1:9)#
+frp#
+pdf("fertilityRate.pdf", width = 12, height = 12 * 1.3 )#
+frp + geom_hline(yintercept = 2.1, color = "darkgrey")#
+dev.off()#
+#
+devSVG(file = "fertilityRateR.svg", width = 12, height = 12 * 1.3)#
+frp + geom_hline(yintercept = 2.1, color = "darkgrey")#
+dev.off()
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+frp2 <- frp + geom_hline(yintercept = 2.1, color = "darkgrey")
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+ggsave(file = "fertilityRate_ggR.svg", image = frp2, width = 12, height = 12 * 1.3)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+ggsave(file = "fertilityRate_ggR.svg", image = frp2)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+ggsave(file = "fertilityRate_ggR.svg")
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+postscript(file = "fertilityRate.ps", width = 12, height = 12 * 1.3)#
+frp2#
+dev.off()
+dev.off()
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+postscript(file = "fertilityRate.eps", width = 12, height = 12 * 1.3)#
+frp2#
+dev.off()
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+frp2
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+ggsave(file = "fertilityRate_R.ps")
+font
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+ggsave(file = "fertilityRate_R.ps", family = font)
+?svg
+frp2
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+svg(file = "fertilityRate_R.svg", width = 12, height = 12 * 1.3
+)
+frp2
+dev.off()
+dev.off()
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Viellissement')
+ggsave(file="fertilityRate_R.svg", plot=frp2, width=10, height=8)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_Q3/2014_07_16_apprenctiseship/analysis/ink new')
+source("~/swissinfo/_helpers/helpers.R")#
+createTranslatedSVG("eduVsneet_1.svg", "educationVsUnemployment.csv")#
+createTranslatedSVG("eduVsneet_2.svg", "educationVsUnemployment.csv")#
+createTranslatedSVG("eduVsneet_3.svg", "educationVsUnemployment.csv")
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Famille')
+data.px <- read.px("data/px-f-01-2C10.px")
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Famille')
+library(pxR)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Famille')
+#############################################################################################
+###		SETTINGS#
+#############################################################################################
+#
+source("~/swissinfo/_helpers/helpers.R")#
+library(pxR)#
+#
+#############################################################################################
+### load mariage rate since 1861#
+#############################################################################################
+#
+data.px <- read.px("data/px-f-01-2B10.px")#
+d <- data.px$DATA[[1]]#
+d$Année <- as.numeric(as.character(d$Année))#
+colnames(d) <- c('indicator', 'year', 'value')#
+# age au premier mariage#
+dage <- dplyr::filter(d, indicator == "Age moyen de l'homme au 1er mariage" |#
+	indicator == "Age moyen de la femme au 1er mariage")#
+dage$indicator <- gsub("^.*(homme|femme).*$", "\\1", dage$indicator)#
+#
+ggplot(dage) + geom_line(aes(year,value, group = indicator, color = indicator)) + ggtheme_ygrid#
+#
+# write csv for datawrapper#
+dage <- dage[which(!is.na(dage$value)),]#
+write.csv(dcast(dage, year  ~ indicator), "data/ageMoyenMariage.csv", row.names = F)#
+#############################################################################################
+### load divorce rate since 1861#
+#############################################################################################
+#
+data.px <- read.px("data/px-f-01-2C10.px")#
+d <- data.px$DATA[[1]]#
+d$Année <- as.numeric(as.character(d$Année))
+d
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Famille')
+idx <- !is.na(d[which(d[,1] == 'Divorces pour 1000 habitants'),'value'])#
+minYear <- min((d[which(d[,1] == 'Divorces pour 1000 habitants'),'Année'])[idx])#
+d <- d[d$Année >= minYear,]
+d
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Famille')
+data.px <- read.px("data/px-f-01-2C10.px")#
+d <- data.px$DATA[[1]]#
+d$Année <- as.numeric(as.character(d$Année))
+d
+str(d)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Famille')
+data.px <- read.px("data/px-f-01-2C10.px")#
+d <- data.px$DATA[[1]]#
+d$Année <- as.numeric(as.character(d$Année))#
+colnames(d)[1] <- 'indicator'
+str(d)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Famille')
+dplyr::filter(d, indicator == "Indicateur conjoncturel de divortialité")
+head(d)
+head(d, 20)
+head(d, 40)
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Famille')
+variables <- c('Durée moyenne du mariage au moment du divorce', 'Indicateur conjoncturel de divortialité')#
+sapply(variables, function(var) {#
+	print(ggplot(data = d[which(d[,1] == var),2:3]) + geom_line(aes(Année, value)) + ggtitle(var) +#
+	theme_minimal() + ylab(var))#
+})
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Famille')
+variables <- c('Indicateur conjoncturel de divortialité', 'Durée moyenne du mariage au moment du divorce')#
+sapply(variables, function(var) {#
+	print(ggplot(data = d[which(d[,1] == var),2:3]) + geom_line(aes(Année, value)) + ggtitle(var) +#
+	theme_minimal() + ylab(var))#
+})
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Famille')
+dd <- dplyr::filter(d, indicator == "Indicateur conjoncturel de divortialité")
+dd
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Famille')
+variables <- c('Indicateur conjoncturel de divortialité', 'Durée moyenne du mariage au moment du divorce')#
+sapply(variables, function(var) {#
+	print(ggplot(data = d[which(d[,1] == var),2:3]) + geom_line(aes(Année, value)) + ggtitle(var) +#
+	theme_minimal() + ylab(var))#
+})
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Famille')
+dplyr::filter(d, indicator == "Indicateur conjoncturel de divortialité")[,2:3]
+setwd('/Users/nguyendu/Google Drive/swissinfo/2014_07_03_evolutionDeLaPopulationSuisse/Famille')
+write.csv(dplyr::filter(d, indicator == "Indicateur conjoncturel de divortialité")[,2:3], "data/indicateurDivortalité.csv", row.names = F)
+library(rCharts)
+p16 <- nPlot(uempmed ~ date, data = economics, type = 'sparklinePlus',height=100,width=500)#
+p16$chart(xTickFormat="#!function(d) {return d3.time.format('%b %Y')(new Date( d * 86400000 ));}!#")#
+p16#
+## semi replicate sparkline with a full nvd3 model by setting short height and turning off lots of things#
+p17 <- nPlot(#
+  x = "date",#
+  y = "volume",#
+  data = spy.df,#
+  type = "multiBarChart",#
+  height = 200)#
+p17$chart(showControls = FALSE, showLegend = FALSE, showXAxis = FALSE, showYAxis = FALSE) #
+p17$xAxis(tickFormat = #
+"#!function(d) {return d3.time.format('%Y-%m-%d')(new Date(d * 24 * 60 * 60 * 1000));}!#"#
+)#
+p17
